@@ -1,0 +1,7 @@
+[requires]
+sfml/2.5.1
+spdlog/1.9.2
+
+[generators]
+cmake
+virtualrunenv

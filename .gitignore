@@ -1,0 +1,6 @@
+# Invisible files at root level
+/.*
+!.gitignore
+
+# Build
+/build/
