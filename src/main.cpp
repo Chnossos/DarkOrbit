@@ -10,10 +10,8 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include <boost/filesystem/operations.hpp>
+#include <sstream>
 #include <spdlog/spdlog.h>
-
-namespace fs = boost::filesystem;
 
 struct PlayerStats
 {
