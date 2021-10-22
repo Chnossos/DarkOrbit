@@ -18,8 +18,8 @@ struct PlayerStats
 
 struct ShipStats
 {
-    uint32_t hp = 236'000, shield = 320'000, ammo = 220'000;
-    uint16_t rockets = 64'000, cargo = 999'999;
+    uint32_t hp = 236'000, shield = 320'000, ammo = 220'000, cargo = 999'999;
+    uint16_t rockets = 64'000;
 } shipStats;
 
 constexpr int getLevelFromXp(uint64_t xp)
