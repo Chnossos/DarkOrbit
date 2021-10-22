@@ -67,16 +67,13 @@ int main() try
 #endif
     spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
 
-//    auto const currentMode = sf::VideoMode::getDesktopMode();
-//    for (auto const & mode : sf::VideoMode::getFullscreenModes())
-//        spdlog::debug("[{}] Mode: {:>4}x{:<4} (depth: {})", mode == currentMode ? "X" : " ",
-//                      mode.width, mode.height, mode.bitsPerPixel);
-
     sf::VideoMode       videoMode(820, 615, sf::VideoMode::getDesktopMode().bitsPerPixel);
     sf::ContextSettings contextSettings(videoMode.bitsPerPixel);
     constexpr auto      windowStyle = sf::Style::Default;
     sf::RenderWindow    window(videoMode, "Dark Orbit", windowStyle, contextSettings);
     window.setVerticalSyncEnabled(true);
+
+    auto const aspectRatio = (float)videoMode.width / (float)videoMode.height;
 
 //    TextureManager textureMgr;
 //
@@ -279,23 +276,35 @@ int main() try
         {
             /**/ if (event.type == sf::Event::Closed)
                 window.close();
-//            else if (event.type == sf::Event::Resized)
-//            {
-//                spdlog::debug("{} x {}", event.size.width, event.size.height);
-//                if (event.size.width < videoMode.width || event.size.height < videoMode.height)
-//                    continue;
-//
-//                float const aspectRatio = (float)videoMode.width / (float)videoMode.height;
-//                float const widthRatio  = ((float)event.size.height * aspectRatio) / videoMode.width;
-//                float const leftRatio   = (1.f - widthRatio) / 2.f;
-//
-//                spdlog::debug("AR = {} ; width = {} ; left = {}", aspectRatio, widthRatio, leftRatio);
-//
-//                auto view = window.getView();
-//                view.setViewport(sf::FloatRect(leftRatio, 0, widthRatio, 1));
-//                window.setView(view);
-//            }
-            else /*if (event.type == sf::Event::MouseMoved)
+            else if (event.type == sf::Event::Resized)
+            {
+                if (event.size.width < videoMode.width || event.size.height < videoMode.height)
+                {
+                    window.setSize({ videoMode.width, videoMode.height });
+                    continue;
+                }
+
+                float const new_width     = aspectRatio * event.size.height;
+                float const new_height    = event.size.width / aspectRatio;
+                float const offset_width  = (event.size.width  - new_width ) / 2.f;
+                float const offset_height = (event.size.height - new_height) / 2.f;
+
+                auto view = window.getDefaultView();
+                if (event.size.width >= aspectRatio * event.size.height)
+                {
+                    view.setViewport(sf::FloatRect(offset_width / event.size.width, 0,
+                                                   new_width    / event.size.width, 1));
+                }
+                else
+                {
+                    view.setViewport(sf::FloatRect(0, offset_height / event.size.height,
+                                                   1, new_height    / event.size.height));
+                }
+                window.setView(view);
+            }
+            else
+                screen->onEvent(event);
+             /*if (event.type == sf::Event::MouseMoved)
             {
                 miniMapPosition.setString(fmt::format("\t\t{}/{}", event.mouseMove.x,
                                                                    event.mouseMove.y));
@@ -304,7 +313,7 @@ int main() try
                     miniMapHeaderLabel.getPosition().y
                 );
             }*/
-                screen->onEvent(event);
+
         }
 
         screen->update(clock.restart());
@@ -313,12 +322,8 @@ int main() try
         screen->draw(gameTexture);
         gameTexture.display();
 
-        sf::Sprite gameView(gameTexture.getTexture());
-//        if (window.getSize().x > videoMode.width)
-//            gameView.setPosition(static_cast<float>(window.getSize().x) / 2, 0);
-
         window.clear();
-        window.draw(gameView);
+        window.draw(sf::Sprite(gameTexture.getTexture()));
         window.display();
 //        window.draw(header);
 //        window.draw(hpAmountBg);
