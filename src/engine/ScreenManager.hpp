@@ -11,7 +11,7 @@
 #include <memory>
 #include <stack>
 
-namespace Core
+namespace Engine
 {
     class ScreenManager
     {
@@ -33,7 +33,7 @@ namespace Core
     public:
         [[nodiscard]] auto top()   const -> BaseScreenPtr { return _screens.top(); }
         [[nodiscard]] auto size()  const -> std::size_t;
-        [[nodiscard]] bool empty() const { return size() == 0; }
+        [[nodiscard]] auto empty() const -> bool          { return size() == 0;    }
 
     private:
         auto push(BaseScreenPtr ptr) -> Screen &;
@@ -42,7 +42,7 @@ namespace Core
     template<class T, typename... Args>
     inline auto ScreenManager::push(Args && ... args) -> T &
     {
-        static_assert(std::is_base_of_v<Screen, T>, "T must inherit Core::Screen");
+        static_assert(std::is_base_of_v<Screen, T>, "T must inherit Engine::Screen");
         return static_cast<T &>(push(std::make_shared<T>(std::forward<Args>(args)...)));
     }
-} // !namespace Core
+} // !namespace Engine

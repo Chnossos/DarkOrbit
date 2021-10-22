@@ -11,7 +11,7 @@ namespace sf
     class Time;
 } // !namespace sf
 
-namespace Core
+namespace Engine
 {
     class Screen
     {
@@ -38,4 +38,4 @@ namespace Core
     };
 
     inline Screen::~Screen() noexcept = default;
-} // !namespace Core
+} // !namespace Engine

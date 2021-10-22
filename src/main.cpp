@@ -1,4 +1,5 @@
-#include "core/ScreenManager.hpp"
+#include "engine/ScreenManager.hpp"
+#include "core/Exception.hpp"
 
 //#include <SFML/Graphics/Font.hpp>
 //#include <SFML/Graphics/RenderWindow.hpp>
@@ -10,7 +11,6 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include <sstream>
 #include <spdlog/spdlog.h>
 
 struct PlayerStats
@@ -37,12 +37,6 @@ constexpr int getLevelFromXp(uint64_t xp)
     return lvl;
 }
 
-template<typename... Args>
-void bAssert(bool ok, fmt::format_string<Args...> msg, Args &&... args)
-{
-    if (!ok) throw std::runtime_error(fmt::format(msg, std::forward<Args>(args)...));
-}
-
 //class TextureManager
 //{
 //private:
@@ -66,8 +60,7 @@ void bAssert(bool ok, fmt::format_string<Args...> msg, Args &&... args)
 
 int main() try
 {
-//    std::setlocale(LC_ALL, "");
-    std::locale::global(std::locale("en_US.UTF-8"));
+    std::locale::global(std::locale(""));
 
 #ifndef NDEBUG
     spdlog::set_level(spdlog::level::debug);
@@ -270,12 +263,12 @@ int main() try
 //        t->setOrigin(t->getLocalBounds().width / 2, t->getLocalBounds().height / 2);
 //    }
 
-    Core::ScreenManager screenManager;
-    sf::RenderTexture   gameTexture;
-    sf::Clock           clock;
+    Engine::ScreenManager screenManager;
+    sf::RenderTexture     gameTexture;
+    sf::Clock             clock;
 
-    bAssert(gameTexture.create(videoMode.width, videoMode.height, contextSettings),
-            "Failed to create game texture");
+    Core::bAssert(gameTexture.create(videoMode.width, videoMode.height, contextSettings),
+                  "Failed to create game texture");
 
     while (window.isOpen())
     {
@@ -366,6 +359,6 @@ int main() try
 }
 catch (std::exception const & e)
 {
-    spdlog::critical(e.what());
+    spdlog::critical(Core::formatExceptionStack(e));
     return EXIT_FAILURE;
 }

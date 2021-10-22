@@ -11,11 +11,13 @@ conan_basic_setup(TARGETS)
 
 set(SOURCES
         src/main.cpp
-        src/core/ScreenManager.cpp
+        src/core/Exception.cpp
+        src/engine/ScreenManager.cpp
 )
 set(HEADERS
-        src/core/Screen.hpp
-        src/core/ScreenManager.hpp
+        src/core/Exception.hpp
+        src/engine/Screen.hpp
+        src/engine/ScreenManager.hpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
