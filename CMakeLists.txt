@@ -9,17 +9,18 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 set(CONAN_SYSTEM_INCLUDES ON)
 conan_basic_setup(TARGETS)
 
-set(SOURCES
-        src/main.cpp
+set(SOURCES src/main.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
         src/engine/TextureManager.cpp
+        src/screens/SpaceMap.cpp
 )
 set(HEADERS
         src/core/Exception.hpp
         src/engine/Screen.hpp
         src/engine/ScreenManager.hpp
         src/engine/TextureManager.hpp
+        src/screens/SpaceMap.hpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
