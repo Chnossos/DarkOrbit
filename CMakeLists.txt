@@ -13,11 +13,13 @@ set(SOURCES
         src/main.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
+        src/engine/TextureManager.cpp
 )
 set(HEADERS
         src/core/Exception.hpp
         src/engine/Screen.hpp
         src/engine/ScreenManager.hpp
+        src/engine/TextureManager.hpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
