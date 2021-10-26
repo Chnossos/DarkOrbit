@@ -22,7 +22,7 @@ int main() try
     std::locale::global(std::locale(""));
 
 #ifndef NDEBUG
-    spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::trace);
 #endif
     spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
 
