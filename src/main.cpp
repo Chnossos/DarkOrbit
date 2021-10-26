@@ -10,6 +10,8 @@
 
 #include <spdlog/spdlog.h>
 
+static void onWindowResize(sf::RenderWindow & w, sf::Vector2f gameViewSz, sf::Vector2f windowSz);
+
 int main() try
 {
     std::locale::global(std::locale(""));
@@ -24,8 +26,6 @@ int main() try
     constexpr auto      windowStyle = sf::Style::Default;
     sf::RenderWindow    window(videoMode, "Dark Orbit", windowStyle, contextSettings);
     window.setVerticalSyncEnabled(true);
-
-    auto const aspectRatio = (float)videoMode.width / (float)videoMode.height;
 
     Engine::ScreenManager screenManager;
     sf::RenderTexture     gameTexture;
@@ -47,33 +47,10 @@ int main() try
                 window.close();
             else if (event.type == sf::Event::Resized)
             {
-                if (event.size.width < videoMode.width || event.size.height < videoMode.height)
-                {
-                    window.setSize({ videoMode.width, videoMode.height });
-                    continue;
-                }
-
-                float const new_width     = aspectRatio * event.size.height;
-                float const new_height    = event.size.width / aspectRatio;
-                float const offset_width  = (event.size.width  - new_width ) / 2.f;
-                float const offset_height = (event.size.height - new_height) / 2.f;
-
-                auto view = window.getDefaultView();
-                if (event.size.width >= aspectRatio * event.size.height)
-                {
-                    view.setViewport(sf::FloatRect(offset_width / event.size.width, 0,
-                                                   new_width    / event.size.width, 1));
-                }
-                else
-                {
-                    view.setViewport(sf::FloatRect(0, offset_height / event.size.height,
-                                                   1, new_height    / event.size.height));
-                }
-                window.setView(view);
+                onWindowResize(window, sf::Vector2f(videoMode.width,  videoMode.height),
+                                       sf::Vector2f(event.size.width, event.size.height));
             }
-            else
-                screen->onEvent(event);
-
+            screen->onEvent(event);
         }
 
         screen->update(clock.restart());
@@ -91,4 +68,35 @@ catch (std::exception const & e)
 {
     spdlog::critical(Core::formatExceptionStack(e));
     return EXIT_FAILURE;
+}
+
+void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Vector2f windowSize)
+{
+    if (windowSize.x < gameViewSize.x || windowSize.y < gameViewSize.y)
+    {
+        window.setSize({static_cast<unsigned>(windowSize.x), static_cast<unsigned>(windowSize.y)});
+        window.setView(window.getDefaultView());
+    }
+    else
+    {
+        auto const aspectRatio = gameViewSize.x / gameViewSize.y;
+
+        float const new_width     =  aspectRatio  * windowSize.y;
+        float const new_height    =  windowSize.x / aspectRatio;
+        float const offset_width  = (windowSize.x - new_width ) / 2.f;
+        float const offset_height = (windowSize.y - new_height) / 2.f;
+
+        auto view = window.getDefaultView();
+        if (windowSize.x >= aspectRatio * windowSize.y)
+        {
+            view.setViewport(sf::FloatRect(offset_width / windowSize.x, 0,
+                                           new_width    / windowSize.x, 1));
+        }
+        else
+        {
+            view.setViewport(sf::FloatRect(0, offset_height / windowSize.y,
+                                           1, new_height    / windowSize.y));
+        }
+        window.setView(view);
+    }
 }
