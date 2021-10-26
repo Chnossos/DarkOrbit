@@ -1,3 +1,7 @@
+/// @file   main.cpp
+/// @author Pierre Caissial
+/// @date   Created on 14/10/2021
+
 #include "core/Exception.hpp"
 #include "engine/ScreenManager.hpp"
 #include "screens/SpaceMap.hpp"
@@ -10,6 +14,7 @@
 
 #include <spdlog/spdlog.h>
 
+static void initWindow(sf::Window & w);
 static void onWindowResize(sf::RenderWindow & w, sf::Vector2f gameViewSz, sf::Vector2f windowSz);
 
 int main() try
@@ -25,17 +30,17 @@ int main() try
     sf::ContextSettings contextSettings(videoMode.bitsPerPixel);
     constexpr auto      windowStyle = sf::Style::Default;
     sf::RenderWindow    window(videoMode, "Dark Orbit", windowStyle, contextSettings);
-    window.setVerticalSyncEnabled(true);
 
-    Engine::ScreenManager screenManager;
-    sf::RenderTexture     gameTexture;
-    sf::Clock             clock;
+    initWindow(window);
 
+    sf::RenderTexture gameTexture;
     Core::bAssert(gameTexture.create(videoMode.width, videoMode.height, contextSettings),
                   "Failed to create game texture");
 
+    Engine::ScreenManager screenManager;
     screenManager.push<Screens::SpaceMapScreen>();
 
+    sf::Clock clock;
     while (window.isOpen())
     {
         auto const screen = screenManager.top();
@@ -68,6 +73,20 @@ catch (std::exception const & e)
 {
     spdlog::critical(Core::formatExceptionStack(e));
     return EXIT_FAILURE;
+}
+
+void initWindow(sf::Window & w)
+{
+    spdlog::trace("Enabling Vertical Sync");
+    w.setVerticalSyncEnabled(true);
+
+    spdlog::trace("Loading Window Icon");
+
+    sf::Image icon;
+    if (!icon.loadFromFile("assets/favicon.png"))
+        spdlog::warn("Failed to load window icon from 'assets/favicon.ico'");
+    else
+        w.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 }
 
 void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Vector2f windowSize)
