@@ -14,6 +14,10 @@
 
 #include <spdlog/spdlog.h>
 
+constexpr unsigned gameWidth  = 820;
+constexpr unsigned gameHeight = 615;
+constexpr float    gameAspectRatio = (float)gameWidth / gameHeight;
+
 static void initWindow(sf::Window & w);
 static void onWindowResize(sf::RenderWindow & w, sf::Vector2f gameViewSz, sf::Vector2f windowSz);
 
@@ -26,7 +30,8 @@ int main() try
 #endif
     spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
 
-    sf::VideoMode       videoMode(820, 615, sf::VideoMode::getDesktopMode().bitsPerPixel);
+    auto const          bitsDepth = sf::VideoMode::getDesktopMode().bitsPerPixel;
+    sf::VideoMode       videoMode(gameWidth, gameHeight, bitsDepth);
     sf::ContextSettings contextSettings(videoMode.bitsPerPixel);
     constexpr auto      windowStyle = sf::Style::Default;
     sf::RenderWindow    window(videoMode, "Dark Orbit", windowStyle, contextSettings);
@@ -81,12 +86,13 @@ void initWindow(sf::Window & w)
     w.setVerticalSyncEnabled(true);
 
     spdlog::trace("Loading Window Icon");
+    constexpr auto path = "assets/favicon.png";
 
     sf::Image icon;
-    if (!icon.loadFromFile("assets/favicon.png"))
-        spdlog::warn("Failed to load window icon from 'assets/favicon.ico'");
-    else
+    if (icon.loadFromFile(path))
         w.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+    else
+        spdlog::warn("Failed to load window icon from '{}'", path);
 }
 
 void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Vector2f windowSize)
@@ -98,24 +104,25 @@ void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Ve
     }
     else
     {
-        auto const aspectRatio = gameViewSize.x / gameViewSize.y;
+        auto top    = 0.f;
+        auto left   = 0.f;
+        auto width  = 1.f;
+        auto height = 1.f;
 
-        float const new_width     =  aspectRatio  * windowSize.y;
-        float const new_height    =  windowSize.x / aspectRatio;
-        float const offset_width  = (windowSize.x - new_width ) / 2.f;
-        float const offset_height = (windowSize.y - new_height) / 2.f;
-
-        auto view = window.getDefaultView();
-        if (windowSize.x >= aspectRatio * windowSize.y)
+        float const windowRatio = windowSize.x / windowSize.y;
+        if (windowRatio < gameAspectRatio)
         {
-            view.setViewport(sf::FloatRect(offset_width / windowSize.x, 0,
-                                           new_width    / windowSize.x, 1));
+            height = windowRatio / gameAspectRatio;
+            top    = (1 - height) / 2.f;
         }
         else
         {
-            view.setViewport(sf::FloatRect(0, offset_height / windowSize.y,
-                                           1, new_height    / windowSize.y));
+            width = gameAspectRatio / windowRatio;
+            left  = (1 - width) / 2.f;
         }
+
+        auto view = window.getDefaultView();
+        view.setViewport(sf::FloatRect(left, top, width, height));
         window.setView(view);
     }
 }
