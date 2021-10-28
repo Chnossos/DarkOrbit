@@ -43,6 +43,11 @@ constexpr int getLevelFromXp(uint64_t xp)
     return lvl;
 }
 
+void setTextPosition(sf::Text & text, float x, float y)
+{
+    text.setPosition(static_cast<int>(x), static_cast<int>(y));
+}
+
 SpaceMapScreen::SpaceMapScreen() noexcept
     : _miniMapPos{0, 0}
 {}
@@ -166,39 +171,31 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     Core::bAssert(font.loadFromFile("assets/font/vudotronic.ttf"), "Failed to load font");
 
     sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, fontSize);
-    miniMapHeaderLabel.setPosition(miniMapHeader.getPosition().x + 6,
-                                   miniMapHeader.getPosition().y);
+    setTextPosition(miniMapHeaderLabel, miniMapHeader.getPosition().x + 6,
+                                        miniMapHeader.getPosition().y);
 
-    sf::Text miniMapPosition("\t\t0/0", font, fontSize);
-    miniMapPosition.setPosition(
-        miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width,
-        miniMapHeaderLabel.getPosition().y
-    );
-    miniMapPosition.setString(fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y));
-    miniMapPosition.setPosition(
+    sf::Text miniMapPosition(fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y), font, fontSize);
+    setTextPosition(miniMapPosition,
         miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width,
         miniMapHeaderLabel.getPosition().y
     );
 
     sf::Text configLabel("CONFIGURATION", font, fontSize);
-    configLabel.setPosition(configLabelBg.getPosition().x + 6,
-                            configLabelBg.getPosition().y);
+    setTextPosition(configLabel, configLabelBg.getPosition().x + 6, configLabelBg.getPosition().y);
 
     sf::Text config1("1", font, fontSize), config2("2", font, fontSize);
-    config1.setPosition(configActive.getPosition().x + 5,
-                        configActive.getPosition().y);
-    config2.setPosition(configInactive.getPosition().x + 5,
-                        configInactive.getPosition().y);
+    setTextPosition(config1, configActive  .getPosition().x + 5, configActive  .getPosition().y);
+    setTextPosition(config2, configInactive.getPosition().x + 5, configInactive.getPosition().y);
 
-    sf::Text xpLabel("EXPERIENCE", font, fontSize);
-    sf::Text levelLabel("LEVEL", font, fontSize);
-    sf::Text honorLabel("HONOR", font, fontSize);
-    sf::Text jackpotLabel("JACKPOT", font, fontSize);
+    sf::Text xpLabel     ("EXPERIENCE", font, fontSize);
+    sf::Text levelLabel  ("LEVEL",      font, fontSize);
+    sf::Text honorLabel  ("HONOR",      font, fontSize);
+    sf::Text jackpotLabel("JACKPOT",    font, fontSize);
 
-    xpLabel     .setPosition(248, startY);
-    levelLabel  .setPosition(248, xpLabel.getPosition().y + fontSize + spacing);
-    honorLabel  .setPosition(248, levelLabel.getPosition().y + fontSize + spacing);
-    jackpotLabel.setPosition(248, honorLabel.getPosition().y + fontSize + spacing);
+    setTextPosition(xpLabel,      248, startY);
+    setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + fontSize + spacing);
+    setTextPosition(honorLabel,   248, levelLabel.getPosition().y + fontSize + spacing);
+    setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + fontSize + spacing);
 
     sf::Text xpValue     (fmt::format("{:L}", playerStats.xp),                 font, fontSize);
     sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(playerStats.xp)), font, fontSize);
@@ -210,34 +207,34 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     honorValue  .setOrigin(honorValue  .getLocalBounds().width, 0);
     jackpotValue.setOrigin(jackpotValue.getLocalBounds().width, 0);
 
-    xpValue.setPosition(415, startY);
-    levelValue.setPosition(xpValue.getPosition().x,
-                           xpValue.getPosition().y + fontSize + spacing);
-    honorValue.setPosition(xpValue.getPosition().x,
-                           levelValue.getPosition().y + fontSize + spacing);
-    jackpotValue.setPosition(xpValue.getPosition().x,
-                             honorValue.getPosition().y + fontSize + spacing);
+    setTextPosition(xpValue,      415, startY);
+    setTextPosition(levelValue,   xpValue.getPosition().x,
+                                  xpValue.getPosition().y + fontSize + spacing);
+    setTextPosition(honorValue,   xpValue.getPosition().x,
+                                  levelValue.getPosition().y + fontSize + spacing);
+    setTextPosition(jackpotValue, xpValue.getPosition().x,
+                                  honorValue.getPosition().y + fontSize + spacing);
 
     sf::Text creditsLabel("CREDITS", font, fontSize);
     sf::Text creditsValue(fmt::format("{:L}", playerStats.credits), font, fontSize);
 
-    creditsLabel.setPosition(510, startY);
-    creditsValue.setPosition(creditsLabel.getPosition().x,
-                             creditsLabel.getPosition().y + fontSize + spacing - 2);
+    setTextPosition(creditsLabel, 510, startY);
+    setTextPosition(creditsValue, creditsLabel.getPosition().x,
+                                  creditsLabel.getPosition().y + fontSize + spacing - 2);
 
     sf::Text uridiumLabel("URIDIUM", font, fontSize);
     sf::Text uridiumValue(fmt::format("{:L}", playerStats.uridium), font, fontSize);
 
-    uridiumLabel.setPosition(580, startY);
-    uridiumValue.setPosition(uridiumLabel.getPosition().x,
-                             uridiumLabel.getPosition().y + fontSize + spacing - 2);
+    setTextPosition(uridiumLabel, 580, startY);
+    setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
+                                  uridiumLabel.getPosition().y + fontSize + spacing - 2);
 
     sf::Text cargoLabel("CARGO BAY", font, fontSize);
     sf::Text cargoValue(fmt::format("{:L}", shipStats.cargo), font, fontSize);
 
-    cargoLabel.setPosition(670 - cargoLabel.getLocalBounds().width / 2, startY);
-    cargoValue.setPosition(cargoLabel.getPosition().x,
-                           cargoLabel.getPosition().y + fontSize + spacing - 2);
+    setTextPosition(cargoLabel, 670 - cargoLabel.getLocalBounds().width / 2, startY);
+    setTextPosition(cargoValue, cargoLabel.getPosition().x,
+                                cargoLabel.getPosition().y + fontSize + spacing - 2);
 
     for (auto && t : { &creditsLabel, &creditsValue, &uridiumLabel,
                        &uridiumValue, &cargoLabel,   &cargoValue })
