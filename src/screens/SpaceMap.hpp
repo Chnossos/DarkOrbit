@@ -14,7 +14,7 @@ class Screens::SpaceMapScreen final : public Engine::Screen
 {
 private:
     Engine::TextureManager _textureManager;
-    sf::Vector2u _miniMapPos;
+    sf::Vector2u           _miniMapPos;
 
 public:
     SpaceMapScreen() noexcept;
@@ -24,6 +24,5 @@ public:
 
 public:
     void onEvent(sf::Event const & event) override;
-    void update(sf::Time const & time) override;
     void draw(sf::RenderTarget & target) override;
 };

@@ -5,6 +5,7 @@
 #include "SpaceMap.hpp"
 
 // Project includes
+#include "../core/Constants.hpp"
 #include "../core/Exception.hpp"
 
 // SFML includes
@@ -85,10 +86,6 @@ void SpaceMapScreen::onEvent(sf::Event const & event)
     }
 }
 
-void SpaceMapScreen::update(sf::Time const &)
-{
-}
-
 void SpaceMapScreen::draw(sf::RenderTarget & target) try
 {
     auto header = _textureManager.sprite("header");
@@ -107,55 +104,55 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
         s->setColor(sf::Color(255, 255, 255, 150));
 
     auto miniMap = _textureManager.sprite("mini-map");
-    miniMap.setPosition(static_cast<float>(target.getSize().x - miniMap.getLocalBounds().width),
-                        static_cast<float>(target.getSize().y - miniMap.getLocalBounds().height));
+    miniMap.setPosition(target.getSize().x - miniMap.getLocalBounds().width,
+                        target.getSize().y - miniMap.getLocalBounds().height);
 
     auto miniMapHeader = _textureManager.sprite("mini-map_header");
     miniMapHeader.setPosition(
-        static_cast<float>(target.getSize().x - miniMapHeader.getLocalBounds().width) + 5,
-        miniMap.getPosition().y - static_cast<float>(miniMapHeader.getLocalBounds().height)
+        target .getSize()    .x - miniMapHeader.getLocalBounds().width + 5,
+        miniMap.getPosition().y - miniMapHeader.getLocalBounds().height
     );
 
     auto configInactive = _textureManager.sprite("config_inactive");
     configInactive.setPosition(
-        static_cast<float>(target.getSize().x - configInactive.getLocalBounds().width),
-        miniMapHeader.getPosition().y - static_cast<float>(configInactive.getLocalBounds().height)
+        target       .getSize()    .x - configInactive.getLocalBounds().width,
+        miniMapHeader.getPosition().y - configInactive.getLocalBounds().height
     );
 
     auto configActive = _textureManager.sprite("config_active");
     configActive.setPosition(
-        configInactive.getPosition().x - static_cast<float>(configActive.getLocalBounds().width),
-        miniMapHeader.getPosition().y - static_cast<float>(configActive.getLocalBounds().height)
+        configInactive.getPosition().x - configActive.getLocalBounds().width,
+        miniMapHeader .getPosition().y - configActive.getLocalBounds().height
     );
 
     auto configLabelBg = _textureManager.sprite("config_label");
     configLabelBg.setPosition(
-        configActive.getPosition().x - static_cast<float>(configLabelBg.getLocalBounds().width),
-        miniMapHeader.getPosition().y - static_cast<float>(configLabelBg.getLocalBounds().height)
+        configActive .getPosition().x - configLabelBg.getLocalBounds().width,
+        miniMapHeader.getPosition().y - configLabelBg.getLocalBounds().height
     );
 
     auto inventoryRight = _textureManager.sprite("inventory_right");
     inventoryRight.setPosition(
-        miniMap.getPosition().x - static_cast<float>(inventoryRight.getLocalBounds().width),
-        static_cast<float>(target.getSize().y - inventoryRight.getLocalBounds().height)
+        miniMap.getPosition().x - inventoryRight.getLocalBounds().width,
+        target .getSize()    .y - inventoryRight.getLocalBounds().height
     );
 
     auto inventoryCenter = _textureManager.sprite("inventory_center");
     inventoryCenter.setPosition(
-        inventoryRight.getPosition().x - static_cast<float>(inventoryCenter.getLocalBounds().width),
+        inventoryRight.getPosition().x - inventoryCenter.getLocalBounds().width,
         inventoryRight.getPosition().y
     );
 
     auto inventoryLeft = _textureManager.sprite("inventory_left");
     inventoryLeft.setPosition(
-        inventoryCenter.getPosition().x - static_cast<float>(inventoryLeft.getLocalBounds().width),
+        inventoryCenter.getPosition().x - inventoryLeft.getLocalBounds().width,
         inventoryCenter.getPosition().y
     );
 
     auto inventoryTriangle = _textureManager.sprite("inventory_triangle");
     inventoryTriangle.setPosition(
-        inventoryRight.getPosition().x - static_cast<float>(inventoryTriangle.getLocalBounds().width),
-        inventoryRight.getPosition().y - static_cast<float>(inventoryTriangle.getLocalBounds().height)
+        inventoryRight.getPosition().x - inventoryTriangle.getLocalBounds().width,
+        inventoryRight.getPosition().y - inventoryTriangle.getLocalBounds().height
     );
 
     auto inventoryContentBg = _textureManager.sprite("inventory_content_bg");
@@ -163,44 +160,48 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
 
     // TEXT
 
-    constexpr auto startY   = 8;
-    constexpr auto fontSize = 10;
-    constexpr auto spacing  = 4;
+    constexpr auto startY  = 8;
+    constexpr auto spacing = 4;
 
     sf::Font font;
     Core::bAssert(font.loadFromFile("assets/font/vudotronic.ttf"), "Failed to load font");
 
-    sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, fontSize);
+    sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, Constants::fontSize);
     setTextPosition(miniMapHeaderLabel, miniMapHeader.getPosition().x + 6,
                                         miniMapHeader.getPosition().y);
 
-    sf::Text miniMapPosition(fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y), font, fontSize);
+    auto const pos = fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y);
+    sf::Text miniMapPosition(pos, font, Constants::fontSize);
     setTextPosition(miniMapPosition,
         miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width,
         miniMapHeaderLabel.getPosition().y
     );
 
-    sf::Text configLabel("CONFIGURATION", font, fontSize);
+    sf::Text configLabel("CONFIGURATION", font, Constants::fontSize);
     setTextPosition(configLabel, configLabelBg.getPosition().x + 6, configLabelBg.getPosition().y);
 
-    sf::Text config1("1", font, fontSize), config2("2", font, fontSize);
+    sf::Text config1("1", font, Constants::fontSize), config2("2", font, Constants::fontSize);
     setTextPosition(config1, configActive  .getPosition().x + 5, configActive  .getPosition().y);
     setTextPosition(config2, configInactive.getPosition().x + 5, configInactive.getPosition().y);
 
-    sf::Text xpLabel     ("EXPERIENCE", font, fontSize);
-    sf::Text levelLabel  ("LEVEL",      font, fontSize);
-    sf::Text honorLabel  ("HONOR",      font, fontSize);
-    sf::Text jackpotLabel("JACKPOT",    font, fontSize);
+    sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize);
+    sf::Text levelLabel  ("LEVEL",      font, Constants::fontSize);
+    sf::Text honorLabel  ("HONOR",      font, Constants::fontSize);
+    sf::Text jackpotLabel("JACKPOT",    font, Constants::fontSize);
 
     setTextPosition(xpLabel,      248, startY);
-    setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + fontSize + spacing);
-    setTextPosition(honorLabel,   248, levelLabel.getPosition().y + fontSize + spacing);
-    setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + fontSize + spacing);
+    setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + Constants::fontSize + spacing);
+    setTextPosition(honorLabel,   248, levelLabel.getPosition().y + Constants::fontSize + spacing);
+    setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + Constants::fontSize + spacing);
 
-    sf::Text xpValue     (fmt::format("{:L}", playerStats.xp),                 font, fontSize);
-    sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(playerStats.xp)), font, fontSize);
-    sf::Text honorValue  (fmt::format("{:L}", playerStats.honor),              font, fontSize);
-    sf::Text jackpotValue(fmt::format("{:L}", playerStats.jackpot),            font, fontSize);
+    sf::Text xpValue     (fmt::format("{:L}", playerStats.xp),
+                          font, Constants::fontSize);
+    sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(playerStats.xp)),
+                          font, Constants::fontSize);
+    sf::Text honorValue  (fmt::format("{:L}", playerStats.honor),
+                          font, Constants::fontSize);
+    sf::Text jackpotValue(fmt::format("{:L}", playerStats.jackpot),
+                          font, Constants::fontSize);
 
     xpValue     .setOrigin(xpValue     .getLocalBounds().width, 0);
     levelValue  .setOrigin(levelValue  .getLocalBounds().width, 0);
@@ -209,32 +210,32 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
 
     setTextPosition(xpValue,      415, startY);
     setTextPosition(levelValue,   xpValue.getPosition().x,
-                                  xpValue.getPosition().y + fontSize + spacing);
+                                  xpValue.getPosition().y + Constants::fontSize + spacing);
     setTextPosition(honorValue,   xpValue.getPosition().x,
-                                  levelValue.getPosition().y + fontSize + spacing);
+                                  levelValue.getPosition().y + Constants::fontSize + spacing);
     setTextPosition(jackpotValue, xpValue.getPosition().x,
-                                  honorValue.getPosition().y + fontSize + spacing);
+                                  honorValue.getPosition().y + Constants::fontSize + spacing);
 
-    sf::Text creditsLabel("CREDITS", font, fontSize);
-    sf::Text creditsValue(fmt::format("{:L}", playerStats.credits), font, fontSize);
+    sf::Text creditsLabel("CREDITS", font, Constants::fontSize);
+    sf::Text creditsValue(fmt::format("{:L}", playerStats.credits), font, Constants::fontSize);
 
     setTextPosition(creditsLabel, 510, startY);
     setTextPosition(creditsValue, creditsLabel.getPosition().x,
-                                  creditsLabel.getPosition().y + fontSize + spacing - 2);
+                                  creditsLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
-    sf::Text uridiumLabel("URIDIUM", font, fontSize);
-    sf::Text uridiumValue(fmt::format("{:L}", playerStats.uridium), font, fontSize);
+    sf::Text uridiumLabel("URIDIUM", font, Constants::fontSize);
+    sf::Text uridiumValue(fmt::format("{:L}", playerStats.uridium), font, Constants::fontSize);
 
     setTextPosition(uridiumLabel, 580, startY);
     setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
-                                  uridiumLabel.getPosition().y + fontSize + spacing - 2);
+                                  uridiumLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
-    sf::Text cargoLabel("CARGO BAY", font, fontSize);
-    sf::Text cargoValue(fmt::format("{:L}", shipStats.cargo), font, fontSize);
+    sf::Text cargoLabel("CARGO BAY", font, Constants::fontSize);
+    sf::Text cargoValue(fmt::format("{:L}", shipStats.cargo), font, Constants::fontSize);
 
     setTextPosition(cargoLabel, 670 - cargoLabel.getLocalBounds().width / 2, startY);
     setTextPosition(cargoValue, cargoLabel.getPosition().x,
-                                cargoLabel.getPosition().y + fontSize + spacing - 2);
+                                cargoLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
     for (auto && t : { &creditsLabel, &creditsValue, &uridiumLabel,
                        &uridiumValue, &cargoLabel,   &cargoValue })
