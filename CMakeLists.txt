@@ -10,12 +10,14 @@ set(CONAN_SYSTEM_INCLUDES ON)
 conan_basic_setup(TARGETS)
 
 set(SOURCES src/main.cpp
+        src/core/Constants.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
         src/engine/TextureManager.cpp
         src/screens/SpaceMap.cpp
 )
 set(HEADERS
+        src/core/Constants.hpp
         src/core/Exception.hpp
         src/engine/Screen.hpp
         src/engine/ScreenManager.hpp

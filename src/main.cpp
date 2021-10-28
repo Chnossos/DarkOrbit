@@ -2,6 +2,7 @@
 /// @author Pierre Caissial
 /// @date   Created on 14/10/2021
 
+#include "core/Constants.hpp"
 #include "core/Exception.hpp"
 #include "engine/ScreenManager.hpp"
 #include "screens/SpaceMap.hpp"
@@ -14,12 +15,8 @@
 
 #include <spdlog/spdlog.h>
 
-constexpr unsigned gameWidth  = 820;
-constexpr unsigned gameHeight = 615;
-constexpr float    gameAspectRatio = (float)gameWidth / gameHeight;
-
 static void initWindow(sf::Window & w);
-static void onWindowResize(sf::RenderWindow & w, sf::Vector2f gameViewSz, sf::Vector2f windowSz);
+static void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
 
 int main() try
 {
@@ -31,10 +28,10 @@ int main() try
     spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
 
     auto const          bitsDepth = sf::VideoMode::getDesktopMode().bitsPerPixel;
-    sf::VideoMode       videoMode(gameWidth, gameHeight, bitsDepth);
+    sf::VideoMode       videoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth);
     sf::ContextSettings contextSettings(videoMode.bitsPerPixel);
     constexpr auto      windowStyle = sf::Style::Default;
-    sf::RenderWindow    window(videoMode, "Dark Orbit", windowStyle, contextSettings);
+    sf::RenderWindow    window(videoMode, Constants::windowTitle, windowStyle, contextSettings);
 
     initWindow(window);
 
@@ -56,10 +53,8 @@ int main() try
             /**/ if (event.type == sf::Event::Closed)
                 window.close();
             else if (event.type == sf::Event::Resized)
-            {
-                onWindowResize(window, sf::Vector2f(videoMode.width,  videoMode.height),
-                                       sf::Vector2f(event.size.width, event.size.height));
-            }
+                onWindowResize(window, sf::Vector2u(event.size.width, event.size.height));
+
             screen->onEvent(event);
         }
 
@@ -95,11 +90,11 @@ void initWindow(sf::Window & w)
         spdlog::warn("Failed to load window icon from '{}'", path);
 }
 
-void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Vector2f windowSize)
+void onWindowResize(sf::RenderWindow & window, sf::Vector2u windowSize)
 {
-    if (windowSize.x < gameViewSize.x || windowSize.y < gameViewSize.y)
+    if (windowSize.x < Constants::gameViewWidth || windowSize.y < Constants::gameViewHeight)
     {
-        window.setSize({static_cast<unsigned>(windowSize.x), static_cast<unsigned>(windowSize.y)});
+        window.setSize(windowSize);
         window.setView(window.getDefaultView());
     }
     else
@@ -109,15 +104,15 @@ void onWindowResize(sf::RenderWindow & window, sf::Vector2f gameViewSize, sf::Ve
         auto width  = 1.f;
         auto height = 1.f;
 
-        float const windowRatio = windowSize.x / windowSize.y;
-        if (windowRatio < gameAspectRatio)
+        auto const windowRatio = (float)windowSize.x / windowSize.y;
+        if (windowRatio < Constants::gameViewRatio)
         {
-            height = windowRatio / gameAspectRatio;
+            height = windowRatio / Constants::gameViewRatio;
             top    = (1 - height) / 2.f;
         }
         else
         {
-            width = gameAspectRatio / windowRatio;
+            width = Constants::gameViewRatio / windowRatio;
             left  = (1 - width) / 2.f;
         }
 
