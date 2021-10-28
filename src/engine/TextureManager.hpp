@@ -23,5 +23,5 @@ public:
     auto load(std::string name, std::filesystem::path const & path) -> sf::Texture &;
 
 public:
-    auto sprite(std::string const & name) const -> sf::Sprite;
+    [[nodiscard]] auto sprite(std::string const & name) const -> sf::Sprite;
 };

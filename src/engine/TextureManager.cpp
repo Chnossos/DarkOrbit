@@ -19,6 +19,8 @@ auto TextureManager::load(std::string name, std::filesystem::path const & path) 
 
 auto TextureManager::sprite(std::string const & name) const -> sf::Sprite
 {
+    sf::Sprite sprite;
     Core::bAssert(_textures.contains(name), "No texture loaded for '{}'", name);
-    return sf::Sprite(_textures.at(name));
+    sprite.setTexture(_textures.at(name));
+    return sprite;
 }
