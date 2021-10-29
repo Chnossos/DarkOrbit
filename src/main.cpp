@@ -2,17 +2,20 @@
 /// @author Pierre Caissial
 /// @date   Created on 14/10/2021
 
+// Project includes
 #include "core/Constants.hpp"
 #include "core/Exception.hpp"
 #include "engine/ScreenManager.hpp"
 #include "screens/SpaceMap.hpp"
 
+// SFML includes
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
 
+// Third-party includes
 #include <spdlog/spdlog.h>
 
 static void initWindow(sf::Window & w);
@@ -20,6 +23,7 @@ static void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
 
 int main() try
 {
+    // Needed for localized fmt::format
     std::locale::global(std::locale(""));
 
 #ifndef NDEBUG
@@ -60,7 +64,7 @@ int main() try
 
         screen->update(clock.restart());
 
-        gameTexture.clear(sf::Color::White);
+        gameTexture.clear();
         screen->draw(gameTexture);
         gameTexture.display();
 
