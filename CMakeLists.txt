@@ -14,7 +14,11 @@ set(SOURCES src/main.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
         src/engine/TextureManager.cpp
+        src/game/Formulas.cpp
         src/screens/SpaceMap.cpp
+        src/utils/Factories.cpp
+        src/utils/SfmlDebug.cpp
+        src/utils/SfmlText.cpp
 )
 set(HEADERS
         src/core/Constants.hpp
@@ -22,7 +26,13 @@ set(HEADERS
         src/engine/Screen.hpp
         src/engine/ScreenManager.hpp
         src/engine/TextureManager.hpp
+        src/game/Formulas.hpp
+        src/game/PlayerStats.hpp
+        src/game/ShipStats.hpp
         src/screens/SpaceMap.hpp
+        src/utils/Factories.hpp
+        src/utils/SfmlDebug.hpp
+        src/utils/SfmlText.hpp
 )
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)

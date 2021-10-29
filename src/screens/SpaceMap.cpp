@@ -7,6 +7,9 @@
 // Project includes
 #include "../core/Constants.hpp"
 #include "../core/Exception.hpp"
+#include "../game/Formulas.hpp"
+#include "../utils/Factories.hpp"
+#include "../utils/SfmlText.hpp"
 
 // SFML includes
 #include <SFML/Graphics/Font.hpp>
@@ -18,52 +21,8 @@
 #include <spdlog/spdlog.h>
 
 using namespace Screens;
-
-struct PlayerStats
-{
-    uint64_t xp = 1'999'888'777'666, honor = 111'222'333, credits = 999'999'999;
-    uint32_t uridium = 99'999'999;
-    uint16_t jackpot = 10'000;
-} playerStats;
-
-struct ShipStats
-{
-    uint32_t hp = 236'000, shield = 320'000, ammo = 220'000, cargo = 999'999;
-    uint16_t rockets = 64'000;
-} shipStats;
-
-constexpr int getLevelFromXp(uint64_t xp)
-{
-    int lvl = 1;
-    while (xp >= 10'000)
-    {
-        xp /= 2;
-        ++lvl;
-    }
-    return lvl;
-}
-
-void setTextPosition(sf::Text & text, float x, float y)
-{
-    text.setPosition(static_cast<int>(x), static_cast<int>(y));
-}
-
-void centerIn(sf::Text & dst, sf::Sprite const & src)
-{
-    dst.setOrigin(static_cast<int>(dst.getLocalBounds().width  / 2),
-                  static_cast<int>(dst.getLocalBounds().height / 2));
-    dst.setPosition(
-        static_cast<int>(src.getGlobalBounds().left + src.getGlobalBounds().width  / 2),
-        static_cast<int>(src.getGlobalBounds().top  + src.getGlobalBounds().height / 2)
-    );
-}
-
-void centerVertically(sf::Text & dst, sf::Sprite const & src, float x)
-{
-    dst.setOrigin(0, static_cast<int>(dst.getLocalBounds().height / 2));
-    dst.setPosition((int)x,
-        static_cast<int>(src.getGlobalBounds().top  + src.getGlobalBounds().height / 2));
-}
+using namespace Utils;
+using Formulas::getLevelFromXp;
 
 SpaceMapScreen::SpaceMapScreen() noexcept
     : _miniMapPos{0, 0}
@@ -161,18 +120,18 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     auto inventoryContentBg = _textureManager.sprite("inventory_content_bg");
     inventoryContentBg.setPosition(370, 579);
 
-    auto ammoAmountBg   = _textureManager.sprite("ammo_rocket_amount_bg");
-    auto rocketAmountBg = _textureManager.sprite("ammo_rocket_amount_bg");
-    auto hpAmountBg     = _textureManager.sprite("hp_amount_bg");
-    auto shieldAmountBg = _textureManager.sprite("shield_amount_bg");
+    auto ammoAmountBg    = _textureManager.sprite("ammo_rocket_amount_bg");
+    auto rocketsAmountBg = _textureManager.sprite("ammo_rocket_amount_bg");
+    auto hpAmountBg      = _textureManager.sprite("hp_amount_bg");
+    auto shieldAmountBg  = _textureManager.sprite("shield_amount_bg");
 
     hpAmountBg    .setPosition(514, 57);
     shieldAmountBg.setPosition(514, 42);
     ammoAmountBg  .setPosition(686, 42);
-    rocketAmountBg.setPosition(686, 57);
+    rocketsAmountBg.setPosition(686, 57);
 
-    for (auto && s : { &hpAmountBg, &shieldAmountBg, &ammoAmountBg, &rocketAmountBg })
-        s->setColor(sf::Color(255, 255, 255, 150));
+    for (auto && s : { &hpAmountBg, &shieldAmountBg, &ammoAmountBg, &rocketsAmountBg })
+        s->setColor(sf::Color(255, 255, 255, 120));
 
     // TEXT
 
@@ -194,7 +153,7 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     centerIn(configLabel, configLabelBg);
 
     sf::Text config1("1", font, Constants::fontSize), config2("2", font, Constants::fontSize);
-    centerIn(config1, configActive);
+    centerIn(config1, configActive, 0, 1);
     centerIn(config2, configInactive);
 
     sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize);
@@ -207,14 +166,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     setTextPosition(honorLabel,   248, levelLabel.getPosition().y + Constants::fontSize + spacing);
     setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + Constants::fontSize + spacing);
 
-    sf::Text xpValue     (fmt::format("{:L}", playerStats.xp),
-                          font, Constants::fontSize);
-    sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(playerStats.xp)),
-                          font, Constants::fontSize);
-    sf::Text honorValue  (fmt::format("{:L}", playerStats.honor),
-                          font, Constants::fontSize);
-    sf::Text jackpotValue(fmt::format("{:L}", playerStats.jackpot),
-                          font, Constants::fontSize);
+    sf::Text xpValue     (fmt::format("{:L}", _player.xp),                 font, Constants::fontSize);
+    sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(_player.xp)), font, Constants::fontSize);
+    sf::Text honorValue  (fmt::format("{:L}", _player.honor),              font, Constants::fontSize);
+    sf::Text jackpotValue(fmt::format("{:L}", _player.jackpot),            font, Constants::fontSize);
 
     xpValue     .setOrigin((int)xpValue     .getLocalBounds().width, 0);
     levelValue  .setOrigin((int)levelValue  .getLocalBounds().width, 0);
@@ -230,21 +185,21 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
                                   honorValue.getPosition().y + Constants::fontSize + spacing);
 
     sf::Text creditsLabel("CREDITS", font, Constants::fontSize);
-    sf::Text creditsValue(fmt::format("{:L}", playerStats.credits), font, Constants::fontSize);
+    sf::Text creditsValue(fmt::format("{:L}", _player.credits), font, Constants::fontSize);
 
     setTextPosition(creditsLabel, 510, startY);
     setTextPosition(creditsValue, creditsLabel.getPosition().x,
                                   creditsLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
     sf::Text uridiumLabel("URIDIUM", font, Constants::fontSize);
-    sf::Text uridiumValue(fmt::format("{:L}", playerStats.uridium), font, Constants::fontSize);
+    sf::Text uridiumValue(fmt::format("{:L}", _player.uridium), font, Constants::fontSize);
 
     setTextPosition(uridiumLabel, 580, startY);
     setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
                                   uridiumLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
     sf::Text cargoLabel("CARGO BAY", font, Constants::fontSize);
-    sf::Text cargoValue(fmt::format("{:L}", shipStats.cargo), font, Constants::fontSize);
+    sf::Text cargoValue(fmt::format("{:L}", _ship.curCargo), font, Constants::fontSize);
 
     setTextPosition(cargoLabel, 670 - cargoLabel.getLocalBounds().width / 2, startY);
     setTextPosition(cargoValue, cargoLabel.getPosition().x,
@@ -256,11 +211,39 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
         t->setOrigin((int)t->getLocalBounds().width / 2, (int)t->getLocalBounds().height / 2);
     }
 
+    sf::Text shieldLabel("SHIELD", font, Constants::fontSize);
+    shieldLabel.setOrigin((int)shieldLabel.getLocalBounds().width, 0);
+    shieldLabel.setPosition(shieldAmountBg.getPosition().x - 5, shieldAmountBg.getPosition().y - 2);
+
+    sf::Text hpLabel("HIT POINTS", font, Constants::fontSize);
+    hpLabel.setOrigin((int)hpLabel.getLocalBounds().width, 0);
+    hpLabel.setPosition(hpAmountBg.getPosition().x - 5, hpAmountBg.getPosition().y - 1);
+
+    sf::Text ammoLabel("AMMO", font, Constants::fontSize);
+    ammoLabel.setOrigin((int)ammoLabel.getLocalBounds().width, 0);
+    ammoLabel.setPosition(ammoAmountBg.getPosition().x - 5, ammoAmountBg.getPosition().y - 1);
+
+    sf::Text rocketsLabel("ROCKETS", font, Constants::fontSize);
+    rocketsLabel.setOrigin((int)rocketsLabel.getLocalBounds().width, 0);
+    rocketsLabel.setPosition(rocketsAmountBg.getPosition().x - 5, rocketsAmountBg.getPosition().y - 1);
+
+    auto shieldValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curShield, _ship.maxShield), font);
+    centerIn(shieldValue, shieldAmountBg);
+
+    auto hpValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curHp, _ship.maxHp), font);
+    centerIn(hpValue, hpAmountBg);
+
+    auto ammoValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curAmmo, _ship.maxAmmo), font);
+    centerIn(ammoValue, ammoAmountBg);
+
+    auto rocketsValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curRockets, _ship.maxRockets), font);
+    centerIn(rocketsValue, rocketsAmountBg);
+
     target.draw(header);
     target.draw(hpAmountBg);
     target.draw(shieldAmountBg);
     target.draw(ammoAmountBg);
-    target.draw(rocketAmountBg);
+    target.draw(rocketsAmountBg);
     target.draw(miniMap);
     target.draw(miniMapHeader);
     target.draw(configLabelBg);
@@ -291,6 +274,14 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     target.draw(uridiumValue);
     target.draw(cargoLabel);
     target.draw(cargoValue);
+    target.draw(shieldLabel);
+    target.draw(shieldValue);
+    target.draw(hpLabel);
+    target.draw(hpValue);
+    target.draw(ammoLabel);
+    target.draw(ammoValue);
+    target.draw(rocketsLabel);
+    target.draw(rocketsValue);
 }
 catch (std::exception const & e)
 {

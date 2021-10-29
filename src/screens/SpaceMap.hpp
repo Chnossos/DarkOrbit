@@ -7,6 +7,8 @@
 // Project includes
 #include "../engine/Screen.hpp"
 #include "../engine/TextureManager.hpp"
+#include "../game/PlayerStats.hpp"
+#include "../game/ShipStats.hpp"
 
 namespace Screens { class SpaceMapScreen; }
 
@@ -15,6 +17,8 @@ class Screens::SpaceMapScreen final : public Engine::Screen
 private:
     Engine::TextureManager _textureManager;
     sf::Vector2u           _miniMapPos;
+    Game::PlayerStats      _player;
+    Game::ShipStats        _ship;
 
 public:
     SpaceMapScreen() noexcept;
