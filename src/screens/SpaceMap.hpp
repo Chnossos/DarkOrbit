@@ -28,5 +28,5 @@ public:
 
 public:
     void onEvent(sf::Event const & event) override;
-    void draw(sf::RenderTarget & target) override;
+    void draw(sf::RenderTarget & target, sf::RenderStates) const override;
 };

@@ -4,16 +4,18 @@
 
 #pragma once
 
+// SFML includes
+#include <SFML/Graphics/Drawable.hpp>
+
 namespace sf
 {
     class Event;
-    class RenderTarget;
     class Time;
 } // !namespace sf
 
 namespace Engine
 {
-    class Screen
+    class Screen : public sf::Drawable
     {
     public:
         Screen()                      noexcept = default;
@@ -28,7 +30,9 @@ namespace Engine
     public:
         virtual void onEvent(sf::Event const  &) {}
         virtual void update (sf::Time  const  &) {}
-        virtual void draw   (sf::RenderTarget &) {}
+
+        /****/  void draw(sf::RenderTarget & target) const { draw(target, sf::RenderStates()); }
+        virtual void draw(sf::RenderTarget &, sf::RenderStates) const {}
 
     public:
         virtual void enter()  {}

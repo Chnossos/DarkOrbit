@@ -61,7 +61,7 @@ void SpaceMapScreen::onEvent(sf::Event const & event)
     }
 }
 
-void SpaceMapScreen::draw(sf::RenderTarget & target) try
+void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
 {
     auto header = _textureManager.sprite("header");
 
