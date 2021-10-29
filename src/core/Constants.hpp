@@ -9,7 +9,7 @@
     CONSTANT(unsigned int, gameViewWidth,  820);                                   \
     CONSTANT(unsigned int, gameViewHeight, 615);                                   \
     CONSTANT(float,        gameViewRatio,  (float)gameViewWidth / gameViewHeight); \
-    CONSTANT(unsigned int, fontSize,       10);
+    CONSTANT(unsigned int, fontSize,       8);
 
 // -------------------------------------------------------------------------------------------------
 

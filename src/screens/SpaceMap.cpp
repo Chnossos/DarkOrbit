@@ -12,7 +12,6 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
-#include <SFML/System/Time.hpp>
 #include <SFML/Window/Event.hpp>
 
 // Third-party includes
@@ -160,11 +159,11 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
 
     // TEXT
 
-    constexpr auto startY  = 8;
-    constexpr auto spacing = 4;
+    constexpr auto startY  = 10;
+    constexpr auto spacing = 6;
 
     sf::Font font;
-    Core::bAssert(font.loadFromFile("assets/font/vudotronic.ttf"), "Failed to load font");
+    Core::bAssert(font.loadFromFile("assets/font/orbitron-bold.ttf"), "Failed to load font");
 
     sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, Constants::fontSize);
     setTextPosition(miniMapHeaderLabel, miniMapHeader.getPosition().x + 6,
