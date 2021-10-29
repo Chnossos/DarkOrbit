@@ -48,6 +48,23 @@ void setTextPosition(sf::Text & text, float x, float y)
     text.setPosition(static_cast<int>(x), static_cast<int>(y));
 }
 
+void centerIn(sf::Text & dst, sf::Sprite const & src)
+{
+    dst.setOrigin(static_cast<int>(dst.getLocalBounds().width  / 2),
+                  static_cast<int>(dst.getLocalBounds().height / 2));
+    dst.setPosition(
+        static_cast<int>(src.getGlobalBounds().left + src.getGlobalBounds().width  / 2),
+        static_cast<int>(src.getGlobalBounds().top  + src.getGlobalBounds().height / 2)
+    );
+}
+
+void centerVertically(sf::Text & dst, sf::Sprite const & src, float x)
+{
+    dst.setOrigin(0, static_cast<int>(dst.getLocalBounds().height / 2));
+    dst.setPosition((int)x,
+        static_cast<int>(src.getGlobalBounds().top  + src.getGlobalBounds().height / 2));
+}
+
 SpaceMapScreen::SpaceMapScreen() noexcept
     : _miniMapPos{0, 0}
 {}
@@ -88,19 +105,6 @@ void SpaceMapScreen::onEvent(sf::Event const & event)
 void SpaceMapScreen::draw(sf::RenderTarget & target) try
 {
     auto header = _textureManager.sprite("header");
-
-    auto ammoAmountBg   = _textureManager.sprite("ammo_rocket_amount_bg");
-    auto rocketAmountBg = _textureManager.sprite("ammo_rocket_amount_bg");
-    auto hpAmountBg     = _textureManager.sprite("hp_amount_bg");
-    auto shieldAmountBg = _textureManager.sprite("shield_amount_bg");
-
-    hpAmountBg    .setPosition(514, 57);
-    shieldAmountBg.setPosition(514, 42);
-    ammoAmountBg  .setPosition(686, 42);
-    rocketAmountBg.setPosition(686, 57);
-
-    for (auto && s : { &hpAmountBg, &shieldAmountBg, &ammoAmountBg, &rocketAmountBg })
-        s->setColor(sf::Color(255, 255, 255, 150));
 
     auto miniMap = _textureManager.sprite("mini-map");
     miniMap.setPosition(target.getSize().x - miniMap.getLocalBounds().width,
@@ -157,6 +161,19 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     auto inventoryContentBg = _textureManager.sprite("inventory_content_bg");
     inventoryContentBg.setPosition(370, 579);
 
+    auto ammoAmountBg   = _textureManager.sprite("ammo_rocket_amount_bg");
+    auto rocketAmountBg = _textureManager.sprite("ammo_rocket_amount_bg");
+    auto hpAmountBg     = _textureManager.sprite("hp_amount_bg");
+    auto shieldAmountBg = _textureManager.sprite("shield_amount_bg");
+
+    hpAmountBg    .setPosition(514, 57);
+    shieldAmountBg.setPosition(514, 42);
+    ammoAmountBg  .setPosition(686, 42);
+    rocketAmountBg.setPosition(686, 57);
+
+    for (auto && s : { &hpAmountBg, &shieldAmountBg, &ammoAmountBg, &rocketAmountBg })
+        s->setColor(sf::Color(255, 255, 255, 150));
+
     // TEXT
 
     constexpr auto startY  = 10;
@@ -166,22 +183,19 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     Core::bAssert(font.loadFromFile("assets/font/orbitron-bold.ttf"), "Failed to load font");
 
     sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, Constants::fontSize);
-    setTextPosition(miniMapHeaderLabel, miniMapHeader.getPosition().x + 6,
-                                        miniMapHeader.getPosition().y);
+    centerVertically(miniMapHeaderLabel, miniMapHeader, miniMapHeader.getPosition().x + 6);
 
     auto const pos = fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y);
     sf::Text miniMapPosition(pos, font, Constants::fontSize);
-    setTextPosition(miniMapPosition,
-        miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width,
-        miniMapHeaderLabel.getPosition().y
-    );
+    centerVertically(miniMapPosition, miniMapHeader,
+         miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width);
 
     sf::Text configLabel("CONFIGURATION", font, Constants::fontSize);
-    setTextPosition(configLabel, configLabelBg.getPosition().x + 6, configLabelBg.getPosition().y);
+    centerIn(configLabel, configLabelBg);
 
     sf::Text config1("1", font, Constants::fontSize), config2("2", font, Constants::fontSize);
-    setTextPosition(config1, configActive  .getPosition().x + 5, configActive  .getPosition().y);
-    setTextPosition(config2, configInactive.getPosition().x + 5, configInactive.getPosition().y);
+    centerIn(config1, configActive);
+    centerIn(config2, configInactive);
 
     sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize);
     sf::Text levelLabel  ("LEVEL",      font, Constants::fontSize);
@@ -202,10 +216,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     sf::Text jackpotValue(fmt::format("{:L}", playerStats.jackpot),
                           font, Constants::fontSize);
 
-    xpValue     .setOrigin(xpValue     .getLocalBounds().width, 0);
-    levelValue  .setOrigin(levelValue  .getLocalBounds().width, 0);
-    honorValue  .setOrigin(honorValue  .getLocalBounds().width, 0);
-    jackpotValue.setOrigin(jackpotValue.getLocalBounds().width, 0);
+    xpValue     .setOrigin((int)xpValue     .getLocalBounds().width, 0);
+    levelValue  .setOrigin((int)levelValue  .getLocalBounds().width, 0);
+    honorValue  .setOrigin((int)honorValue  .getLocalBounds().width, 0);
+    jackpotValue.setOrigin((int)jackpotValue.getLocalBounds().width, 0);
 
     setTextPosition(xpValue,      415, startY);
     setTextPosition(levelValue,   xpValue.getPosition().x,
@@ -239,7 +253,7 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     for (auto && t : { &creditsLabel, &creditsValue, &uridiumLabel,
                        &uridiumValue, &cargoLabel,   &cargoValue })
     {
-        t->setOrigin(t->getLocalBounds().width / 2, t->getLocalBounds().height / 2);
+        t->setOrigin((int)t->getLocalBounds().width / 2, (int)t->getLocalBounds().height / 2);
     }
 
     target.draw(header);
