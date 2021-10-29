@@ -4,8 +4,8 @@
 
 #pragma once
 
-// C++ includes
-#include <string>
+// Third-party includes
+#include <spdlog/fmt/fmt.h>
 
 namespace sf
 {
@@ -26,4 +26,15 @@ namespace Utils
     auto makeText(std::string const & str, sf::Font const & font) -> sf::Text;
     auto makeText(std::string const & str, sf::Font const & font,
                   unsigned int fontSize) -> sf::Text;
+
+    template<typename... Args>
+    inline auto makeText(sf::Font const & font, fmt::format_string<Args...> str, Args &&... args) {
+        return makeText(fmt::format(std::move(str), std::forward<Args>(args)...), font);
+    }
+
+    template<typename... Args>
+    inline auto makeText(sf::Font const & font, unsigned int fontSize,
+                         fmt::format_string<Args...> str, Args &&... args) {
+        return makeText(fmt::format(std::move(str), std::forward<Args>(args)...), font, fontSize);
+    }
 } // !namespace Utils

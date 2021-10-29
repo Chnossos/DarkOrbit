@@ -136,7 +136,7 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     // TEXT
 
     constexpr auto startY  = 10;
-    constexpr auto spacing = 6;
+    constexpr auto spacing = 10;
 
     sf::Font font;
     Core::bAssert(font.loadFromFile("assets/font/orbitron-bold.ttf"), "Failed to load font");
@@ -156,10 +156,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     centerIn(config1, configActive, 0, 1);
     centerIn(config2, configInactive);
 
-    sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize);
-    sf::Text levelLabel  ("LEVEL",      font, Constants::fontSize);
-    sf::Text honorLabel  ("HONOR",      font, Constants::fontSize);
-    sf::Text jackpotLabel("JACKPOT",    font, Constants::fontSize);
+    sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize + 1);
+    sf::Text levelLabel  ("LEVEL",      font, Constants::fontSize + 1);
+    sf::Text honorLabel  ("HONOR",      font, Constants::fontSize + 1);
+    sf::Text jackpotLabel("JACKPOT",    font, Constants::fontSize + 1);
 
     setTextPosition(xpLabel,      248, startY);
     setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + Constants::fontSize + spacing);
@@ -184,21 +184,21 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
     setTextPosition(jackpotValue, xpValue.getPosition().x,
                                   honorValue.getPosition().y + Constants::fontSize + spacing);
 
-    sf::Text creditsLabel("CREDITS", font, Constants::fontSize);
+    sf::Text creditsLabel("CREDITS", font, Constants::fontSize + 1);
     sf::Text creditsValue(fmt::format("{:L}", _player.credits), font, Constants::fontSize);
 
     setTextPosition(creditsLabel, 510, startY);
     setTextPosition(creditsValue, creditsLabel.getPosition().x,
                                   creditsLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
-    sf::Text uridiumLabel("URIDIUM", font, Constants::fontSize);
+    sf::Text uridiumLabel("URIDIUM", font, Constants::fontSize + 1);
     sf::Text uridiumValue(fmt::format("{:L}", _player.uridium), font, Constants::fontSize);
 
     setTextPosition(uridiumLabel, 580, startY);
     setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
                                   uridiumLabel.getPosition().y + Constants::fontSize + spacing - 2);
 
-    sf::Text cargoLabel("CARGO BAY", font, Constants::fontSize);
+    sf::Text cargoLabel("CARGO BAY", font, Constants::fontSize + 1);
     sf::Text cargoValue(fmt::format("{:L}", _ship.curCargo), font, Constants::fontSize);
 
     setTextPosition(cargoLabel, 670 - cargoLabel.getLocalBounds().width / 2, startY);
@@ -211,32 +211,32 @@ void SpaceMapScreen::draw(sf::RenderTarget & target) try
         t->setOrigin((int)t->getLocalBounds().width / 2, (int)t->getLocalBounds().height / 2);
     }
 
-    sf::Text shieldLabel("SHIELD", font, Constants::fontSize);
+    sf::Text shieldLabel("SHIELD", font, Constants::fontSize + 1);
     shieldLabel.setOrigin((int)shieldLabel.getLocalBounds().width, 0);
     shieldLabel.setPosition(shieldAmountBg.getPosition().x - 5, shieldAmountBg.getPosition().y - 2);
 
-    sf::Text hpLabel("HIT POINTS", font, Constants::fontSize);
+    sf::Text hpLabel("HIT POINTS", font, Constants::fontSize + 1);
     hpLabel.setOrigin((int)hpLabel.getLocalBounds().width, 0);
     hpLabel.setPosition(hpAmountBg.getPosition().x - 5, hpAmountBg.getPosition().y - 1);
 
-    sf::Text ammoLabel("AMMO", font, Constants::fontSize);
+    sf::Text ammoLabel("AMMO", font, Constants::fontSize + 1);
     ammoLabel.setOrigin((int)ammoLabel.getLocalBounds().width, 0);
     ammoLabel.setPosition(ammoAmountBg.getPosition().x - 5, ammoAmountBg.getPosition().y - 1);
 
-    sf::Text rocketsLabel("ROCKETS", font, Constants::fontSize);
+    sf::Text rocketsLabel("ROCKETS", font, Constants::fontSize + 1);
     rocketsLabel.setOrigin((int)rocketsLabel.getLocalBounds().width, 0);
     rocketsLabel.setPosition(rocketsAmountBg.getPosition().x - 5, rocketsAmountBg.getPosition().y - 1);
 
-    auto shieldValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curShield, _ship.maxShield), font);
+    auto shieldValue = Utils::makeText(font, "{:L} / {:L}", _ship.curShield, _ship.maxShield);
     centerIn(shieldValue, shieldAmountBg);
 
-    auto hpValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curHp, _ship.maxHp), font);
+    auto hpValue = Utils::makeText(font, "{:L} / {:L}", _ship.curHp, _ship.maxHp);
     centerIn(hpValue, hpAmountBg);
 
-    auto ammoValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curAmmo, _ship.maxAmmo), font);
+    auto ammoValue = Utils::makeText(font, "{:L} / {:L}", _ship.curAmmo, _ship.maxAmmo);
     centerIn(ammoValue, ammoAmountBg);
 
-    auto rocketsValue = Utils::makeText(fmt::format("{:L} / {:L}", _ship.curRockets, _ship.maxRockets), font);
+    auto rocketsValue = Utils::makeText(font, "{:L} / {:L}", _ship.curRockets, _ship.maxRockets);
     centerIn(rocketsValue, rocketsAmountBg);
 
     target.draw(header);
