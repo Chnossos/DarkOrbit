@@ -13,7 +13,7 @@ auto TextureManager::load(std::string name, std::filesystem::path const & path) 
 {
     auto & texture = _textures.try_emplace(std::move(name)).first->second;
     Core::bAssert(texture.loadFromFile(path.string()),
-                  "Failed to load font '{}' from {}", name, path.string());
+                  "Failed to load texture '{}' from {}", name, path.string());
     return texture;
 }
 

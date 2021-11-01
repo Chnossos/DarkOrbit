@@ -5,8 +5,8 @@
 #include "SfmlText.hpp"
 
 // SFML includes
-#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 void Utils::setTextPosition(sf::Text & text, float x, float y)
 {

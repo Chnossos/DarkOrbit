@@ -4,13 +4,10 @@
 
 #include "Formulas.hpp"
 
+// C++ includes
+#include <cmath>
+
 uint8_t Formulas::getLevelFromXp(uint64_t xp)
 {
-    uint8_t lvl = 1;
-    while (xp >= 10'000)
-    {
-        xp /= 2;
-        ++lvl;
-    }
-    return lvl;
+    return 2 + std::log2l(static_cast<long double>(xp) / 10'000);
 }

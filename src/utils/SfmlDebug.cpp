@@ -8,7 +8,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 // Third-party includes
-#include <spdlog/fmt/fmt.h>
+#include <fmt/format.h>
 
 // C++ includes
 #include <ostream>

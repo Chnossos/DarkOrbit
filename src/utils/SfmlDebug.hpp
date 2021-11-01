@@ -5,7 +5,7 @@
 #pragma once
 
 // Third-party includes
-#include <spdlog/fmt/ostr.h>
+#include <fmt/ostream.h>
 
 // C++ includes
 #include <iosfwd>

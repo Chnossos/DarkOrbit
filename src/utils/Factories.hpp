@@ -5,7 +5,7 @@
 #pragma once
 
 // Third-party includes
-#include <spdlog/fmt/fmt.h>
+#include <fmt/format.h>
 
 namespace sf
 {

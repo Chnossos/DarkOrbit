@@ -37,8 +37,15 @@ set(HEADERS
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_FMT_EXTERNAL)
 conan_target_link_libraries(${PROJECT_NAME})
 
-if(CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
+elseif(MSVC)
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            /wd4244 # conversion warnings, even on static_cast...
+    )
+    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
 endif()

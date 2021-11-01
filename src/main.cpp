@@ -18,29 +18,56 @@
 // Third-party includes
 #include <spdlog/spdlog.h>
 
+#ifdef WIN32
+# ifndef WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+# endif
+# include <Windows.h>
+#endif
+
+std::string getCurrentLocale()
+{
+    std::string result;
+
+#ifdef WIN32
+    wchar_t name[LOCALE_NAME_MAX_LENGTH];
+    if (LCIDToLocaleName(GetThreadLocale(), name, LOCALE_NAME_MAX_LENGTH, 0))
+    {
+        // locale names don't contain weird character so it's okay
+        for (wchar_t c : std::wstring(name))
+            result += (char)c;
+    }
+#endif
+
+    return result;
+}
+
 static void initWindow(sf::Window & w);
 static void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
 
 int main() try
 {
-    // Needed for localized fmt::format
-    std::locale::global(std::locale(""));
+#ifdef WIN32
+    SetConsoleOutputCP(CP_UTF8);
+#endif
 
 #ifndef NDEBUG
     spdlog::set_level(spdlog::level::trace);
 #endif
     spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
 
-    auto const          bitsDepth = sf::VideoMode::getDesktopMode().bitsPerPixel;
-    sf::VideoMode       videoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth);
-    sf::ContextSettings contextSettings(videoMode.bitsPerPixel);
-    constexpr auto      windowStyle = sf::Style::Default;
-    sf::RenderWindow    window(videoMode, Constants::windowTitle, windowStyle, contextSettings);
+    // Needed for localized fmt::format
+    std::locale::global(std::locale(getCurrentLocale()));
+
+    auto const       bitsDepth   = sf::VideoMode::getDesktopMode().bitsPerPixel;
+    sf::VideoMode    videoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth);
+    constexpr auto   windowStyle = sf::Style::Default;
+    sf::RenderWindow window(videoMode, Constants::windowTitle, windowStyle);
 
     initWindow(window);
 
     sf::RenderTexture gameTexture;
-    Core::bAssert(gameTexture.create(videoMode.width, videoMode.height, contextSettings),
+    Core::bAssert(gameTexture.create(videoMode.width, videoMode.height),
                   "Failed to create game texture");
 
     Engine::ScreenManager screenManager;
