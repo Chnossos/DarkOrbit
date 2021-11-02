@@ -22,11 +22,11 @@
 
 using namespace Screens;
 using namespace Utils;
-using Formulas::getLevelFromXp;
 
 SpaceMapScreen::SpaceMapScreen() noexcept
-    : _miniMapPos{0, 0}
-{}
+{
+    _player.level = Formulas::getLevelFromXp(_player.xp);
+}
 
 void SpaceMapScreen::enter() try
 {
@@ -135,75 +135,71 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
 
     // TEXT
 
-    constexpr auto startY  = 10;
+    constexpr auto startY  = 8;
     constexpr auto spacing = 10;
 
     sf::Font font;
     Core::bAssert(font.loadFromFile("assets/font/orbitron-bold.ttf"), "Failed to load font");
 
-    sf::Text miniMapHeaderLabel("MAP\t\t\t/POS", font, Constants::fontSize);
+    auto miniMapHeaderLabel = makeText(font, "MAP\t\t\t/POS");
     centerVertically(miniMapHeaderLabel, miniMapHeader, miniMapHeader.getPosition().x + 6);
 
-    auto const pos = fmt::format("\t\t{}/{}", _miniMapPos.x, _miniMapPos.y);
-    sf::Text miniMapPosition(pos, font, Constants::fontSize);
+    auto miniMapPosition = makeText(font, "\t\t{}/{}", _miniMapPos.x, _miniMapPos.y);
     centerVertically(miniMapPosition, miniMapHeader,
          miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width);
 
-    sf::Text configLabel("CONFIGURATION", font, Constants::fontSize);
+    auto configLabel = makeText(font, "CONFIGURATION");
     centerIn(configLabel, configLabelBg);
 
-    sf::Text config1("1", font, Constants::fontSize), config2("2", font, Constants::fontSize);
+    auto config1 = makeText(font, "1");
+    auto config2 = makeText(font, "2");
+
     centerIn(config1, configActive, 0, 1);
     centerIn(config2, configInactive);
 
-    sf::Text xpLabel     ("EXPERIENCE", font, Constants::fontSize + 1);
-    sf::Text levelLabel  ("LEVEL",      font, Constants::fontSize + 1);
-    sf::Text honorLabel  ("HONOR",      font, Constants::fontSize + 1);
-    sf::Text jackpotLabel("JACKPOT",    font, Constants::fontSize + 1);
+    auto xpLabel      = makeText(font, "EXPERIENCE");
+    auto levelLabel   = makeText(font, "LEVEL");
+    auto honorLabel   = makeText(font, "HONOR");
+    auto jackpotLabel = makeText(font, "JACKPOT");
 
     setTextPosition(xpLabel,      248, startY);
     setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + Constants::fontSize + spacing);
     setTextPosition(honorLabel,   248, levelLabel.getPosition().y + Constants::fontSize + spacing);
     setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + Constants::fontSize + spacing);
 
-    sf::Text xpValue     (fmt::format("{:L}", _player.xp),                 font, Constants::fontSize);
-    sf::Text levelValue  (fmt::format("{:L}", getLevelFromXp(_player.xp)), font, Constants::fontSize);
-    sf::Text honorValue  (fmt::format("{:L}", _player.honor),              font, Constants::fontSize);
-    sf::Text jackpotValue(fmt::format("{:L}", _player.jackpot),            font, Constants::fontSize);
+    auto xpValue      = makeText(font, "{:L}", _player.xp);
+    auto levelValue   = makeText(font, "{:L}", _player.level);
+    auto honorValue   = makeText(font, "{:L}", _player.honor);
+    auto jackpotValue = makeText(font, "{:L}", _player.jackpot);
 
     xpValue     .setOrigin((int)xpValue     .getLocalBounds().width, 0);
     levelValue  .setOrigin((int)levelValue  .getLocalBounds().width, 0);
     honorValue  .setOrigin((int)honorValue  .getLocalBounds().width, 0);
     jackpotValue.setOrigin((int)jackpotValue.getLocalBounds().width, 0);
 
-    setTextPosition(xpValue,      415, startY);
-    setTextPosition(levelValue,   xpValue.getPosition().x,
-                                  xpValue.getPosition().y + Constants::fontSize + spacing);
-    setTextPosition(honorValue,   xpValue.getPosition().x,
-                                  levelValue.getPosition().y + Constants::fontSize + spacing);
-    setTextPosition(jackpotValue, xpValue.getPosition().x,
-                                  honorValue.getPosition().y + Constants::fontSize + spacing);
+    setTextPosition(xpValue,      415,                     xpLabel     .getGlobalBounds().top);
+    setTextPosition(levelValue,   xpValue.getPosition().x, levelLabel  .getGlobalBounds().top);
+    setTextPosition(honorValue,   xpValue.getPosition().x, honorLabel  .getGlobalBounds().top);
+    setTextPosition(jackpotValue, xpValue.getPosition().x, jackpotLabel.getGlobalBounds().top);
 
-    sf::Text creditsLabel("CREDITS", font, Constants::fontSize + 1);
-    sf::Text creditsValue(fmt::format("{:L}", _player.credits), font, Constants::fontSize);
+    auto creditsLabel = makeText(font, "CREDITS");
+    auto uridiumLabel = makeText(font, "URIDIUM");
+    auto cargoLabel   = makeText(font, "CARGO BAY");
 
-    setTextPosition(creditsLabel, 510, startY);
+    auto creditsValue = makeText(font, "{:L}", _player.credits);
+    auto uridiumValue = makeText(font, "{:L}", _player.uridium);
+    auto cargoValue   = makeText(font, "{:L}", _ship.curCargo);
+
+    setTextPosition(creditsLabel, 510,                                         startY + 2);
+    setTextPosition(uridiumLabel, 580,                                         startY + 2);
+    setTextPosition(cargoLabel,   670 - cargoLabel.getLocalBounds().width / 2, startY + 2);
+
     setTextPosition(creditsValue, creditsLabel.getPosition().x,
                                   creditsLabel.getPosition().y + Constants::fontSize + spacing - 2);
-
-    sf::Text uridiumLabel("URIDIUM", font, Constants::fontSize + 1);
-    sf::Text uridiumValue(fmt::format("{:L}", _player.uridium), font, Constants::fontSize);
-
-    setTextPosition(uridiumLabel, 580, startY);
     setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
                                   uridiumLabel.getPosition().y + Constants::fontSize + spacing - 2);
-
-    sf::Text cargoLabel("CARGO BAY", font, Constants::fontSize + 1);
-    sf::Text cargoValue(fmt::format("{:L}", _ship.curCargo), font, Constants::fontSize);
-
-    setTextPosition(cargoLabel, 670 - cargoLabel.getLocalBounds().width / 2, startY);
-    setTextPosition(cargoValue, cargoLabel.getPosition().x,
-                                cargoLabel.getPosition().y + Constants::fontSize + spacing - 2);
+    setTextPosition(cargoValue,   cargoLabel  .getPosition().x,
+                                  cargoLabel  .getPosition().y + Constants::fontSize + spacing - 2);
 
     for (auto && t : { &creditsLabel, &creditsValue, &uridiumLabel,
                        &uridiumValue, &cargoLabel,   &cargoValue })
@@ -211,32 +207,38 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
         t->setOrigin((int)t->getLocalBounds().width / 2, (int)t->getLocalBounds().height / 2);
     }
 
-    sf::Text shieldLabel("SHIELD", font, Constants::fontSize + 1);
-    shieldLabel.setOrigin((int)shieldLabel.getLocalBounds().width, 0);
-    shieldLabel.setPosition(shieldAmountBg.getPosition().x - 5, shieldAmountBg.getPosition().y - 2);
+    auto shieldLabel  = makeText(font, "SHIELD");
+    auto hpLabel      = makeText(font, "HIT POINTS");
+    auto ammoLabel    = makeText(font, "AMMO");
+    auto rocketsLabel = makeText(font, "ROCKETS");
 
-    sf::Text hpLabel("HIT POINTS", font, Constants::fontSize + 1);
-    hpLabel.setOrigin((int)hpLabel.getLocalBounds().width, 0);
-    hpLabel.setPosition(hpAmountBg.getPosition().x - 5, hpAmountBg.getPosition().y - 1);
-
-    sf::Text ammoLabel("AMMO", font, Constants::fontSize + 1);
-    ammoLabel.setOrigin((int)ammoLabel.getLocalBounds().width, 0);
-    ammoLabel.setPosition(ammoAmountBg.getPosition().x - 5, ammoAmountBg.getPosition().y - 1);
-
-    sf::Text rocketsLabel("ROCKETS", font, Constants::fontSize + 1);
+    hpLabel     .setOrigin((int)hpLabel     .getLocalBounds().width, 0);
+    shieldLabel .setOrigin((int)shieldLabel .getLocalBounds().width, 0);
+    ammoLabel   .setOrigin((int)ammoLabel   .getLocalBounds().width, 0);
     rocketsLabel.setOrigin((int)rocketsLabel.getLocalBounds().width, 0);
-    rocketsLabel.setPosition(rocketsAmountBg.getPosition().x - 5, rocketsAmountBg.getPosition().y - 1);
 
-    auto shieldValue = Utils::makeText(font, "{:L} / {:L}", _ship.curShield, _ship.maxShield);
-    centerIn(shieldValue, shieldAmountBg);
+    shieldLabel .setPosition(shieldAmountBg .getPosition().x - 5,
+                             shieldAmountBg .getPosition().y - 2);
+    hpLabel     .setPosition(hpAmountBg     .getPosition().x - 5,
+                             hpAmountBg     .getPosition().y - 1);
+    ammoLabel   .setPosition(ammoAmountBg   .getPosition().x - 5,
+                             ammoAmountBg   .getPosition().y - 1);
+    rocketsLabel.setPosition(rocketsAmountBg.getPosition().x - 5,
+                             rocketsAmountBg.getPosition().y - 1);
 
-    auto hpValue = Utils::makeText(font, "{:L} / {:L}", _ship.curHp, _ship.maxHp);
-    centerIn(hpValue, hpAmountBg);
+    auto shieldValue  = makeText(font, "{:L} / {:L}", _ship.curShield,  _ship.maxShield);
+    auto hpValue      = makeText(font, "{:L} / {:L}", _ship.curHp,      _ship.maxHp);
+    auto ammoValue    = makeText(font, "{:L} / {:L}", _ship.curAmmo,    _ship.maxAmmo);
+    auto rocketsValue = makeText(font, "{:L} / {:L}", _ship.curRockets, _ship.maxRockets);
 
-    auto ammoValue = Utils::makeText(font, "{:L} / {:L}", _ship.curAmmo, _ship.maxAmmo);
-    centerIn(ammoValue, ammoAmountBg);
+    setOutline(shieldValue,  sf::Color::Black);
+    setOutline(hpValue,      sf::Color::Black);
+    setOutline(ammoValue,    sf::Color::Black);
+    setOutline(rocketsValue, sf::Color::Black);
 
-    auto rocketsValue = Utils::makeText(font, "{:L} / {:L}", _ship.curRockets, _ship.maxRockets);
+    centerIn(shieldValue,  shieldAmountBg);
+    centerIn(hpValue,      hpAmountBg);
+    centerIn(ammoValue,    ammoAmountBg);
     centerIn(rocketsValue, rocketsAmountBg);
 
     target.draw(header);
@@ -283,7 +285,7 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     target.draw(rocketsLabel);
     target.draw(rocketsValue);
 }
-catch (std::exception const & e)
+catch (...)
 {
-    spdlog::error("Failed to draw frame:\n{}", Core::formatExceptionStack(e));
+    THROW_NESTED("Failed to draw frame");
 }

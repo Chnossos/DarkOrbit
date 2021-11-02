@@ -4,14 +4,34 @@
 
 #include "SfmlText.hpp"
 
+// Project includes
+#include "../core/Constants.hpp"
+
 // SFML includes
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
+
+auto Utils::makeText(sf::Font const & font, std::string const & str) -> sf::Text
+{
+    return makeText(font, Constants::fontSize, str);
+}
+
+auto Utils::makeText(sf::Font const & font, unsigned fontSize, std::string const & str) -> sf::Text
+{
+    sf::Text text(str, font, fontSize);
+    return text;
+}
 
 void Utils::setTextPosition(sf::Text & text, float x, float y)
 {
     text.setPosition(static_cast<int>(x - text.getLocalBounds().left),
                      static_cast<int>(y - text.getLocalBounds().top));
+}
+
+void Utils::setOutline(sf::Text & text, sf::Color const & color, float thickness)
+{
+    text.setOutlineThickness(thickness);
+    text.setOutlineColor(color);
 }
 
 void Utils::centerIn(sf::Text & dst, sf::Sprite const & src, float x, float y)
