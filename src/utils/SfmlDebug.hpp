@@ -7,9 +7,6 @@
 // Third-party includes
 #include <fmt/ostream.h>
 
-// C++ includes
-#include <iosfwd>
-
 namespace sf
 {
     template<typename T> class Rect;

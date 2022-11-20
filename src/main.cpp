@@ -20,25 +20,13 @@
 # include <windows.h>
 #endif
 
-std::string getCurrentLocale()
+namespace
 {
-    std::string result;
-
-#ifdef WIN32
-    wchar_t name[LOCALE_NAME_MAX_LENGTH];
-    if (LCIDToLocaleName(GetThreadLocale(), name, LOCALE_NAME_MAX_LENGTH, 0))
-    {
-        // locale names don't contain weird character so it's okay
-        for (wchar_t c : std::wstring(name))
-            result += (char)c;
-    }
-#endif
-
-    return result;
-}
-
-static void initWindow(sf::Window & w);
-static void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
+    void configureLogging();
+    void initWindow(sf::Window & w);
+    void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
+    std::string getCurrentLocale();
+} // !namespace
 
 int main() try
 {
@@ -46,23 +34,13 @@ int main() try
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-#ifndef NDEBUG
-    spdlog::set_level(spdlog::level::trace);
-#endif
-    spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
+    configureLogging();
 
-    // Needed for localized fmt::format
-    std::locale::global(std::locale(getCurrentLocale()));
-
-    auto const       bitsDepth   = sf::VideoMode::getDesktopMode().bitsPerPixel;
-    sf::VideoMode    videoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth);
-    constexpr auto   windowStyle = sf::Style::Default;
-    sf::RenderWindow window(videoMode, Constants::windowTitle, windowStyle);
-
+    sf::RenderWindow window;
     initWindow(window);
 
     sf::RenderTexture gameTexture;
-    Core::bAssert(gameTexture.create(videoMode.width, videoMode.height),
+    Core::bAssert(gameTexture.create(window.getSize().x, window.getSize().y),
                   "Failed to create game texture");
 
     Engine::ScreenManager screenManager;
@@ -101,49 +79,83 @@ catch (std::exception const & e)
     return EXIT_FAILURE;
 }
 
-void initWindow(sf::Window & w)
+namespace
 {
-    spdlog::trace("Enabling Vertical Sync");
-    w.setVerticalSyncEnabled(true);
-
-    spdlog::trace("Loading Window Icon");
-    constexpr auto path = "assets/favicon.png";
-
-    sf::Image icon;
-    if (icon.loadFromFile(path))
-        w.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    else
-        spdlog::warn("Failed to load window icon from '{}'", path);
-}
-
-void onWindowResize(sf::RenderWindow & window, sf::Vector2u windowSize)
-{
-    if (windowSize.x < Constants::gameViewWidth || windowSize.y < Constants::gameViewHeight)
+    void configureLogging()
     {
-        window.setSize(windowSize);
-        window.setView(window.getDefaultView());
+//#ifndef NDEBUG
+        spdlog::set_level(spdlog::level::trace);
+//#endif
+        spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
+
+        // Needed for localized string format
+        std::locale const currentLocale(getCurrentLocale());
+        std::locale::global(currentLocale);
+        spdlog::trace("Current locale: {}", currentLocale.c_str());
     }
-    else
-    {
-        auto top    = 0.f;
-        auto left   = 0.f;
-        auto width  = 1.f;
-        auto height = 1.f;
 
-        auto const windowRatio = (float)windowSize.x / windowSize.y;
-        if (windowRatio < Constants::gameViewRatio)
+    void initWindow(sf::Window & w)
+    {
+        auto const bitsDepth = sf::VideoMode::getDesktopMode().bitsPerPixel;
+        w.create(sf::VideoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth),
+                 Constants::windowTitle, sf::Style::Default);
+
+        spdlog::trace("Enabling vertical sync");
+        w.setVerticalSyncEnabled(true);
+
+        spdlog::trace("Loading application icon");
+        constexpr auto path = "assets/favicon.png";
+
+        if (sf::Image icon; icon.loadFromFile(path))
+            w.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+        else
+            spdlog::warn("Failed to load application icon from '{}'", path);
+    }
+
+    void onWindowResize(sf::RenderWindow & window, sf::Vector2u windowSize)
+    {
+        if (windowSize.x < Constants::gameViewWidth || windowSize.y < Constants::gameViewHeight)
         {
-            height = windowRatio / Constants::gameViewRatio;
-            top    = (1 - height) / 2.f;
+            window.setSize(windowSize);
+            window.setView(window.getDefaultView());
         }
         else
         {
-            width = Constants::gameViewRatio / windowRatio;
-            left  = (1 - width) / 2.f;
-        }
+            auto top    = 0.f;
+            auto left   = 0.f;
+            auto width  = 1.f;
+            auto height = 1.f;
 
-        auto view = window.getDefaultView();
-        view.setViewport(sf::FloatRect(left, top, width, height));
-        window.setView(view);
+            auto const windowRatio = (float)windowSize.x / windowSize.y;
+            if (windowRatio < Constants::gameViewRatio)
+            {
+                height = windowRatio / Constants::gameViewRatio;
+                top    = (1 - height) / 2.f;
+            }
+            else
+            {
+                width = Constants::gameViewRatio / windowRatio;
+                left  = (1 - width) / 2.f;
+            }
+
+            auto view = window.getDefaultView();
+            view.setViewport(sf::FloatRect(left, top, width, height));
+            window.setView(view);
+        }
     }
-}
+
+    std::string getCurrentLocale()
+    {
+        std::string result;
+#ifdef _WIN32
+        wchar_t name[LOCALE_NAME_MAX_LENGTH];
+        if (auto size = LCIDToLocaleName(GetThreadLocale(), name, LOCALE_NAME_MAX_LENGTH, 0))
+        {
+            result.resize(static_cast<std::size_t>(--size)); // Decrement to remove leading '\0'
+            // locale names don't contain weird character so it's okay
+            std::transform(name, name + size, result.begin(), [](auto const c) { return (char)c; });
+        }
+#endif
+        return result;
+    }
+} // !namespace
