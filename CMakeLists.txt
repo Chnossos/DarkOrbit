@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
 project(DarkOrbit VERSION 0.1.0)
 
-find_package(sfml   REQUIRED COMPONENTS Graphics)
+find_package(sfml   REQUIRED COMPONENTS Graphics Main)
 find_package(spdlog REQUIRED)
 
 add_executable(${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF WIN32_EXECUTABLE TRUE)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
@@ -15,6 +15,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         sfml-graphics
+        sfml-main
         spdlog::spdlog
 )
 

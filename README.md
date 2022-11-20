@@ -5,6 +5,8 @@ This is a pet project of mine so that I can play with a few tools mixed altogeth
 
 DarkOrbit (now named [DarkOrbit: Reloaded][6]) is a old Flash & web-based MMO game I used to play a lot when I was younger. The old client was a fixed-size window and UI, so recreating it makes for a great small learning project, not having to support thousands of modern features and configurations.
 
+Do note that this is **not** a multi-player game client. And it won't be in any foreseeable future.
+
 ## How to build
 
 You need to install and configure Conan, CMake 3.17+ and Ninja.
@@ -33,6 +35,8 @@ cmake --build --preset release
 ```
 
 ### Run
+
+You can either copy the executable next to the `assets` folder, or — if you want the logs — run:
 
 ```shell
 # Windows (CMD or Powershell)

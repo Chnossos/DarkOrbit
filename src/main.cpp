@@ -92,6 +92,11 @@ namespace
         spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v (%s:%!:%#)");
 #endif
 
+#ifdef _WIN32
+        // Enable logs when started from a terminal (IDE or external)
+        AttachConsole(ATTACH_PARENT_PROCESS);
+#endif
+
         auto console = spdlog::create_async_nb<spdlog::sinks::stdout_color_sink_mt>("console");
         spdlog::set_default_logger(std::move(console));
 
