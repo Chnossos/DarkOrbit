@@ -18,7 +18,7 @@ auto Utils::makeText(sf::Font const & font, std::string const & str) -> sf::Text
 
 auto Utils::makeText(sf::Font const & font, unsigned fontSize, std::string const & str) -> sf::Text
 {
-    sf::Text text(str, font, fontSize);
+    sf::Text text(sf::String::fromUtf8(str.cbegin(), str.cend()), font, fontSize);
     return text;
 }
 

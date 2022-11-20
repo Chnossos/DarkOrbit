@@ -32,10 +32,6 @@ namespace
 
 int main() try
 {
-#ifdef _WIN32
-    SetConsoleOutputCP(CP_UTF8);
-#endif
-
     configureLogging();
 
     sf::RenderWindow window;
@@ -94,7 +90,8 @@ namespace
 
 #ifdef _WIN32
         // Enable logs when started from a terminal (IDE or external)
-        AttachConsole(ATTACH_PARENT_PROCESS);
+        if (AttachConsole(ATTACH_PARENT_PROCESS))
+            SetConsoleOutputCP(CP_UTF8);
 #endif
 
         auto console = spdlog::create_async_nb<spdlog::sinks::stdout_color_sink_mt>("console");
