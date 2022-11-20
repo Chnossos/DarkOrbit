@@ -3,4 +3,7 @@
 !.gitignore
 
 # Build
-/build/
+build
+
+# CMake
+CMakeUserPresets.json
