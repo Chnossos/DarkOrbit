@@ -33,7 +33,6 @@ endif()
 
 set(SOURCES
         src/main.cpp
-        src/core/Constants.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
         src/engine/TextureManager.cpp

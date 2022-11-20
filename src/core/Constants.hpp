@@ -4,17 +4,11 @@
 
 #pragma once
 
-#define LIST_OF_CONSTANTS                                                          \
-    CONSTANT(char const *, windowTitle,    "Dark Orbit");                          \
-    CONSTANT(unsigned int, gameViewWidth,  820);                                   \
-    CONSTANT(unsigned int, gameViewHeight, 615);                                   \
-    CONSTANT(float,        gameViewRatio,  (float)gameViewWidth / gameViewHeight); \
-    CONSTANT(unsigned int, fontSize,       8);
-
-// -------------------------------------------------------------------------------------------------
-
-#define CONSTANT(type, name, value) extern type const name
-
-namespace Constants { LIST_OF_CONSTANTS }
-
-#undef CONSTANT
+namespace Constants
+{
+    constexpr char const * windowTitle    = "Dark Orbit";
+    constexpr unsigned int gameViewWidth  = 820;
+    constexpr unsigned int gameViewHeight = 615;
+    constexpr float        gameViewRatio  = (float)gameViewWidth / gameViewHeight;
+    constexpr unsigned int fontSize       = 8;
+} // !namespace Constants
