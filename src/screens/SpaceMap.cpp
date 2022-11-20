@@ -122,9 +122,9 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     auto hpAmountBg      = _textureManager.sprite("hp_amount_bg");
     auto shieldAmountBg  = _textureManager.sprite("shield_amount_bg");
 
-    hpAmountBg    .setPosition(514, 57);
-    shieldAmountBg.setPosition(514, 42);
-    ammoAmountBg  .setPosition(686, 42);
+    hpAmountBg     .setPosition(514, 57);
+    shieldAmountBg .setPosition(514, 42);
+    ammoAmountBg   .setPosition(686, 42);
     rocketsAmountBg.setPosition(686, 57);
 
     for (auto && s : { &hpAmountBg, &shieldAmountBg, &ammoAmountBg, &rocketsAmountBg })
@@ -234,10 +234,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     setOutline(ammoValue,    sf::Color::Black);
     setOutline(rocketsValue, sf::Color::Black);
 
-    centerIn(shieldValue,  shieldAmountBg);
-    centerIn(hpValue,      hpAmountBg);
-    centerIn(ammoValue,    ammoAmountBg);
-    centerIn(rocketsValue, rocketsAmountBg);
+    centerIn(shieldValue,  shieldAmountBg,  0, 1);
+    centerIn(hpValue,      hpAmountBg,      0, 1);
+    centerIn(ammoValue,    ammoAmountBg,    0, 1);
+    centerIn(rocketsValue, rocketsAmountBg, 0, 1);
 
     target.draw(header);
     target.draw(hpAmountBg);
