@@ -34,6 +34,10 @@ set(HEADERS
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+        $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         sfml-graphics
@@ -45,5 +49,10 @@ if(CMAKE_CXX_COMPILER_ID IN_LIST "GNU;Clang")
         PRIVATE
             -Wall -Wextra
             $<$<NOT:$<STREQUAL:${CMAKE_CXX_SIMULATE_ID},MSVC>>:-pedantic-errors>
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            /EHsc # Enable exception stack unwinding
     )
 endif()

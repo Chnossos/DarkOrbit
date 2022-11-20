@@ -16,11 +16,8 @@
 #include <SFML/Window/Event.hpp>
 #include <spdlog/spdlog.h>
 
-#ifdef WIN32
-# ifndef WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
-# endif
-# include <Windows.h>
+#ifdef _WIN32
+# include <windows.h>
 #endif
 
 std::string getCurrentLocale()
@@ -45,7 +42,7 @@ static void onWindowResize(sf::RenderWindow & w, sf::Vector2u windowSz);
 
 int main() try
 {
-#ifdef WIN32
+#ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
