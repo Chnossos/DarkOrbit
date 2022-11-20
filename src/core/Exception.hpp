@@ -38,7 +38,7 @@ namespace Core
     }
 
 #define THROW_NESTED(...) \
-    Core::throwWithNested(__LINE__, std::filesystem::path(__FILE__).stem().string(), __VA_ARGS__)
+    Core::throwWithNested(__LINE__, std::filesystem::path(__FILE__).filename().string(), __VA_ARGS__)
 
     /// Boolean assert: Throws an error formatted with @p format and @p args if @p expr is false
     template<typename... Args>
