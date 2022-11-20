@@ -27,7 +27,7 @@ SpaceMapScreen::SpaceMapScreen() noexcept
 
 void SpaceMapScreen::enter() try
 {
-    spdlog::trace("[SpaceMap] Loading textures");
+    SPDLOG_TRACE("[SpaceMap] Loading textures");
     _textureManager.load("header",                "assets/ui/header.png");
     _textureManager.load("ammo_rocket_amount_bg", "assets/ui/ammo_rocket_amount_bg.png");
     _textureManager.load("hp_amount_bg",          "assets/ui/hit_points_amount_bg.png");
@@ -42,11 +42,11 @@ void SpaceMapScreen::enter() try
     _textureManager.load("inventory_left",        "assets/ui/inventory_left.png");
     _textureManager.load("inventory_triangle",    "assets/ui/inventory_triangle.png");
     _textureManager.load("inventory_content_bg",  "assets/ui/inventory_content_bg.png");
-    spdlog::trace("[SpaceMap] Loading done");
+    SPDLOG_TRACE("[SpaceMap] Loading done");
 }
 catch (...)
 {
-    spdlog::error("[SpaceMap] Failed to load textures");
+    SPDLOG_ERROR("[SpaceMap] Failed to load textures");
 }
 
 void SpaceMapScreen::onEvent(sf::Event const & event)

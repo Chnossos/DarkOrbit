@@ -4,6 +4,33 @@ project(DarkOrbit VERSION 0.1.0)
 find_package(sfml   REQUIRED COMPONENTS Graphics)
 find_package(spdlog REQUIRED)
 
+add_executable(${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+        SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE
+        $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        sfml-graphics
+        spdlog::spdlog
+)
+
+if(CMAKE_CXX_COMPILER_ID IN_LIST "GNU;Clang")
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            -Wall -Wextra
+            $<$<NOT:$<STREQUAL:${CMAKE_CXX_SIMULATE_ID},MSVC>>:-pedantic-errors>
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    target_compile_options(${PROJECT_NAME}
+        PRIVATE
+            /EHsc # Enable exception stack unwinding
+    )
+endif()
+
 set(SOURCES
         src/main.cpp
         src/core/Constants.cpp
@@ -30,29 +57,4 @@ set(HEADERS
         src/utils/SfmlDebug.hpp
         src/utils/SfmlText.hpp
 )
-
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-target_compile_definitions(${PROJECT_NAME}
-    PRIVATE
-        $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
-)
-target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        sfml-graphics
-        spdlog::spdlog
-)
-
-if(CMAKE_CXX_COMPILER_ID IN_LIST "GNU;Clang")
-    target_compile_options(${PROJECT_NAME}
-        PRIVATE
-            -Wall -Wextra
-            $<$<NOT:$<STREQUAL:${CMAKE_CXX_SIMULATE_ID},MSVC>>:-pedantic-errors>
-    )
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    target_compile_options(${PROJECT_NAME}
-        PRIVATE
-            /EHsc # Enable exception stack unwinding
-    )
-endif()
+target_sources(${PROJECT_NAME} PRIVATE ${SOURCES} ${HEADERS})

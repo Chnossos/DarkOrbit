@@ -14,7 +14,9 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
+#include <spdlog/async.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #ifdef _WIN32
 # include <windows.h>
@@ -75,7 +77,7 @@ int main() try
 }
 catch (std::exception const & e)
 {
-    spdlog::critical(Core::formatExceptionStack(e));
+    SPDLOG_CRITICAL(Core::formatExceptionStack(e));
     return EXIT_FAILURE;
 }
 
@@ -83,15 +85,20 @@ namespace
 {
     void configureLogging()
     {
-//#ifndef NDEBUG
         spdlog::set_level(spdlog::level::trace);
-//#endif
-        spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v");
+#ifdef NDEBUG
+        spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v (%s:%#)");
+#else
+        spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v (%s:%!:%#)");
+#endif
+
+        auto console = spdlog::create_async_nb<spdlog::sinks::stdout_color_sink_mt>("console");
+        spdlog::set_default_logger(std::move(console));
 
         // Needed for localized string format
         std::locale const currentLocale(getCurrentLocale());
         std::locale::global(currentLocale);
-        spdlog::trace("Current locale: {}", currentLocale.c_str());
+        SPDLOG_TRACE("Current locale: {}", currentLocale.c_str());
     }
 
     void initWindow(sf::Window & w)
@@ -100,10 +107,10 @@ namespace
         w.create(sf::VideoMode(Constants::gameViewWidth, Constants::gameViewHeight, bitsDepth),
                  Constants::windowTitle, sf::Style::Default);
 
-        spdlog::trace("Enabling vertical sync");
+        SPDLOG_DEBUG("Enabling vertical sync");
         w.setVerticalSyncEnabled(true);
 
-        spdlog::trace("Loading application icon");
+        SPDLOG_TRACE("Loading application icon");
         constexpr auto path = "assets/favicon.png";
 
         if (sf::Image icon; icon.loadFromFile(path))
