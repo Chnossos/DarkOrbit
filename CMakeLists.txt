@@ -1,15 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
-project(DarkOrbit)
+project(DarkOrbit VERSION 0.1.0)
 
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    message(FATAL_ERROR "Missing ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake, run conan install first")
-endif()
+find_package(sfml   REQUIRED COMPONENTS Graphics)
+find_package(spdlog REQUIRED)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-set(CONAN_SYSTEM_INCLUDES ON)
-conan_basic_setup(TARGETS)
-
-set(SOURCES src/main.cpp
+set(SOURCES
+        src/main.cpp
         src/core/Constants.cpp
         src/core/Exception.cpp
         src/engine/ScreenManager.cpp
@@ -34,18 +30,20 @@ set(HEADERS
         src/utils/SfmlDebug.hpp
         src/utils/SfmlText.hpp
 )
+
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
-target_compile_definitions(${PROJECT_NAME} PRIVATE SPDLOG_FMT_EXTERNAL)
-conan_target_link_libraries(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        sfml-graphics
+        spdlog::spdlog
+)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
-elseif(MSVC)
+if(CMAKE_CXX_COMPILER_ID IN_LIST "GNU;Clang")
     target_compile_options(${PROJECT_NAME}
         PRIVATE
-            /wd4244 # conversion warnings, even on static_cast...
+            -Wall -Wextra
+            $<$<NOT:$<STREQUAL:${CMAKE_CXX_SIMULATE_ID},MSVC>>:-pedantic-errors>
     )
-    target_link_options(${PROJECT_NAME} PRIVATE /ignore:4099)
 endif()

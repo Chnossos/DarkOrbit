@@ -4,10 +4,8 @@
 
 #include "SfmlDebug.hpp"
 
-// SFML includes
+// third-party includes
 #include <SFML/Graphics/Rect.hpp>
-
-// Third-party includes
 #include <fmt/format.h>
 
 // C++ includes

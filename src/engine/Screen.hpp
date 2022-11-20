@@ -4,7 +4,7 @@
 
 #pragma once
 
-// SFML includes
+// third-party includes
 #include <SFML/Graphics/Drawable.hpp>
 
 namespace sf

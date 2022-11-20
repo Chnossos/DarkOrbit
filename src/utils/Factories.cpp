@@ -4,7 +4,7 @@
 
 #include "Factories.hpp"
 
-// SFML includes
+// third-party includes
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Text.hpp>

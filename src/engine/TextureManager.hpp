@@ -4,7 +4,7 @@
 
 #pragma once
 
-// SFML includes
+// third-party includes
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Texture.hpp>
 

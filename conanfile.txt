@@ -1,8 +1,10 @@
 [requires]
 sfml/2.5.1
-spdlog/1.9.2
-freetype/[~2.10]
+spdlog/1.11.0
+
+[layout]
+cmake_layout
 
 [generators]
-cmake
-virtualrunenv
+CMakeToolchain
+CMakeDeps

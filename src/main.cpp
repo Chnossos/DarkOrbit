@@ -8,14 +8,12 @@
 #include "engine/ScreenManager.hpp"
 #include "screens/SpaceMap.hpp"
 
-// SFML includes
+// Third-party includes
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-
-// Third-party includes
 #include <spdlog/spdlog.h>
 
 #ifdef WIN32

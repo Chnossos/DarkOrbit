@@ -8,16 +8,13 @@
 #include "../core/Constants.hpp"
 #include "../core/Exception.hpp"
 #include "../game/Formulas.hpp"
-#include "../utils/Factories.hpp"
 #include "../utils/SfmlText.hpp"
 
-// SFML includes
+// Third-party includes
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Window/Event.hpp>
-
-// Third-party includes
 #include <spdlog/spdlog.h>
 
 using namespace Screens;
@@ -172,10 +169,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     auto honorValue   = makeText(font, "{:L}", _player.honor);
     auto jackpotValue = makeText(font, "{:L}", _player.jackpot);
 
-    xpValue     .setOrigin((int)xpValue     .getLocalBounds().width, 0);
-    levelValue  .setOrigin((int)levelValue  .getLocalBounds().width, 0);
-    honorValue  .setOrigin((int)honorValue  .getLocalBounds().width, 0);
-    jackpotValue.setOrigin((int)jackpotValue.getLocalBounds().width, 0);
+    xpValue     .setOrigin(std::ceilf(xpValue     .getLocalBounds().width), 0.f);
+    levelValue  .setOrigin(std::ceilf(levelValue  .getLocalBounds().width), 0.f);
+    honorValue  .setOrigin(std::ceilf(honorValue  .getLocalBounds().width), 0.f);
+    jackpotValue.setOrigin(std::ceilf(jackpotValue.getLocalBounds().width), 0.f);
 
     setTextPosition(xpValue,      415,                     xpLabel     .getGlobalBounds().top);
     setTextPosition(levelValue,   xpValue.getPosition().x, levelLabel  .getGlobalBounds().top);
@@ -201,10 +198,11 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     setTextPosition(cargoValue,   cargoLabel  .getPosition().x,
                                   cargoLabel  .getPosition().y + Constants::fontSize + spacing - 2);
 
-    for (auto && t : { &creditsLabel, &creditsValue, &uridiumLabel,
-                       &uridiumValue, &cargoLabel,   &cargoValue })
+    for (sf::Text * t : { &creditsLabel, &creditsValue, &uridiumLabel,
+                          &uridiumValue, &cargoLabel,   &cargoValue })
     {
-        t->setOrigin((int)t->getLocalBounds().width / 2, (int)t->getLocalBounds().height / 2);
+        t->setOrigin(std::ceilf(t->getLocalBounds().width  / 2),
+                     std::ceilf(t->getLocalBounds().height / 2));
     }
 
     auto shieldLabel  = makeText(font, "SHIELD");
@@ -212,10 +210,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     auto ammoLabel    = makeText(font, "AMMO");
     auto rocketsLabel = makeText(font, "ROCKETS");
 
-    hpLabel     .setOrigin((int)hpLabel     .getLocalBounds().width, 0);
-    shieldLabel .setOrigin((int)shieldLabel .getLocalBounds().width, 0);
-    ammoLabel   .setOrigin((int)ammoLabel   .getLocalBounds().width, 0);
-    rocketsLabel.setOrigin((int)rocketsLabel.getLocalBounds().width, 0);
+    hpLabel     .setOrigin(std::ceilf(hpLabel     .getLocalBounds().width), 0.f);
+    shieldLabel .setOrigin(std::ceilf(shieldLabel .getLocalBounds().width), 0.f);
+    ammoLabel   .setOrigin(std::ceilf(ammoLabel   .getLocalBounds().width), 0.f);
+    rocketsLabel.setOrigin(std::ceilf(rocketsLabel.getLocalBounds().width), 0.f);
 
     shieldLabel .setPosition(shieldAmountBg .getPosition().x - 5,
                              shieldAmountBg .getPosition().y - 2);
