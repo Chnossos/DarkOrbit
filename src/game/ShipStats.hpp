@@ -11,8 +11,19 @@ namespace Game
 {
     struct ShipStats
     {
-        uint32_t curHp = 22'301,  curShield = 8'282,   curAmmo = 75'987,  curCargo = 157'984;
-        uint32_t maxHp = 236'000, maxShield = 320'000, maxAmmo = 220'000, maxCargo = 999'999;
-        uint16_t curRockets = 7'045, maxRockets = 16'000;
+        static constexpr uint32_t curHp      = 236'000;
+        static constexpr uint32_t maxHp      = 236'000;
+
+        static constexpr uint32_t curShield  = 320'000;
+        static constexpr uint32_t maxShield  = 320'000;
+
+        static constexpr uint32_t curAmmo    = 220'000;
+        static constexpr uint32_t maxAmmo    = 220'000;
+
+        static constexpr uint32_t curRockets =  16'000;
+        static constexpr uint32_t maxRockets =  16'000;
+
+        static constexpr uint32_t curCargo   = 999'999;
+        static constexpr uint32_t maxCargo   = 999'999;
     };
 } // !namespace Game
