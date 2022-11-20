@@ -10,12 +10,16 @@
 #include "../game/PlayerStats.hpp"
 #include "../game/ShipStats.hpp"
 
+// Third-party includes
+#include <SFML/Graphics/Font.hpp>
+
 namespace Screens { class SpaceMapScreen; }
 
 class Screens::SpaceMapScreen final : public Engine::Screen
 {
 private:
     Engine::TextureManager _textureManager;
+    sf::Font               _font;
     sf::Vector2u           _miniMapPos;
     Game::PlayerStats      _player;
     Game::ShipStats        _ship;

@@ -11,4 +11,5 @@ namespace Constants
     constexpr unsigned int gameViewHeight = 615;
     constexpr float        gameViewRatio  = (float)gameViewWidth / gameViewHeight;
     constexpr unsigned int fontSize       = 8;
+    constexpr char const * fontFamily     = "orbitron-bold.ttf";
 } // !namespace Constants
