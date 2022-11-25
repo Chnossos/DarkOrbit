@@ -19,7 +19,7 @@ class Screens::SpaceMapScreen final : public Engine::Screen
 {
 private:
     Engine::TextureManager _textureManager;
-    sf::Font               _font;
+    sf::Font               _font, _nbFont;
     sf::Vector2u           _miniMapPos;
     Game::PlayerStats      _player;
     Game::ShipStats        _ship;

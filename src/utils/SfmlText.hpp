@@ -6,34 +6,50 @@
 
 // Third-party includes
 #include <fmt/format.h>
+#include <SFML/Graphics/Text.hpp>
 
 namespace sf
 {
     class Color;
     class Font;
     class Sprite;
-    class Text;
 } // !namespace sf
 
-namespace Utils
+class Text : public sf::Text
 {
-    auto makeText(sf::Font const & font, std::string const & str) -> sf::Text;
-    auto makeText(sf::Font const & font, unsigned fontSize, std::string const & str) -> sf::Text;
+protected:
+    using sf::Text::Text;
+
+public:
+    static auto make(sf::Font const & font, unsigned fontSize, std::string const & str) -> Text;
 
     template<typename... Args>
-    inline auto makeText(sf::Font const & font, fmt::format_string<Args...> str, Args &&... args) {
-        return makeText(font, fmt::format(std::move(str), std::forward<Args>(args)...));
+    static auto make(sf::Font const & font, unsigned fontSize,
+                         fmt::format_string<Args...> str, Args &&... args)
+    {
+        auto const text = fmt::format(std::move(str), std::forward<Args>(args)...);
+        return make(font, fontSize, text);
     }
 
-    template<typename... Args>
-    inline auto makeText(sf::Font const & font, unsigned fontSize,
-                         fmt::format_string<Args...> str, Args &&... args) {
-        return makeText(font, fontSize, fmt::format(std::move(str), std::forward<Args>(args)...));
-    }
+public:
+    sf::Vector2f getTopLeftPosition() const;
+    sf::Vector2f getTopRightPosition() const;
+    sf::Vector2f getBottomLeftPosition() const;
+    sf::Vector2f getBottomRightPosition() const;
+    float getGlobalWidth() const;
+    float getGlobalHeight() const;
 
-    void setOutline(sf::Text & text, sf::Color const & color, float thickness = 1.f);
+public:
+    void setCenterOrigin();
+    void setVerticalCenterOrigin();
+    void setHorizontalCenterOrigin();
+    void resetOrigin();
+    void centerIn(sf::Sprite const & source);
+    void centerVertically(sf::Sprite const & source);
+    void centerHorizontally(sf::Sprite const & source);
+    void moveUnder(sf::Text const & source, float offsetY);
 
-    void setTextPosition (sf::Text & text, float x, float y);
-    void centerIn        (sf::Text & dst, sf::Sprite const & src, float x = 0, float y = 0);
-    void centerVertically(sf::Text & dst, sf::Sprite const & src, float x,     float y = 0);
-} // !namespace Utils
+public:
+    void setOutline(sf::Color const & color, float thickness = 0);
+    void removeOutline();
+};

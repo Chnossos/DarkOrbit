@@ -11,43 +11,105 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Text.hpp>
 
-auto Utils::makeText(sf::Font const & font, std::string const & str) -> sf::Text
+auto Text::make(sf::Font const & font, unsigned fontSize, std::string const & str) -> Text
 {
-    return makeText(font, Constants::fontSize, str);
-}
-
-auto Utils::makeText(sf::Font const & font, unsigned fontSize, std::string const & str) -> sf::Text
-{
-    sf::Text text(sf::String::fromUtf8(str.cbegin(), str.cend()), font, fontSize);
+    Text text(sf::String::fromUtf8(str.cbegin(), str.cend()), font, fontSize);
     return text;
 }
 
-void Utils::setTextPosition(sf::Text & text, float x, float y)
+sf::Vector2f Text::getTopLeftPosition() const
 {
-    text.setPosition(std::ceilf(x - text.getLocalBounds().left),
-                     std::ceilf(y - text.getLocalBounds().top));
+    auto const bounds = getGlobalBounds();
+    return { bounds.left, bounds.top };
 }
 
-void Utils::setOutline(sf::Text & text, sf::Color const & color, float thickness)
+sf::Vector2f Text::getTopRightPosition() const
 {
-    text.setOutlineThickness(thickness);
-    text.setOutlineColor(color);
+    auto const bounds = getGlobalBounds();
+    return { bounds.left + bounds.width, bounds.top };
 }
 
-void Utils::centerIn(sf::Text & dst, sf::Sprite const & src, float x, float y)
+sf::Vector2f Text::getBottomLeftPosition() const
 {
-    float const width  = src.getGlobalBounds().width  / 2 - dst.getGlobalBounds().width  / 2;
-    float const height = src.getGlobalBounds().height / 2 - dst.getGlobalBounds().height / 2;
-
-    dst.setPosition(
-        std::ceilf(src.getGlobalBounds().left + width  - dst.getLocalBounds().left + x),
-        std::ceilf(src.getGlobalBounds().top  + height - dst.getLocalBounds().top  + y)
-    );
+    auto const bounds = getGlobalBounds();
+    return { bounds.left, bounds.top + bounds.height };
 }
 
-void Utils::centerVertically(sf::Text & dst, sf::Sprite const & src, float x, float y)
+sf::Vector2f Text::getBottomRightPosition() const
 {
-    float const height = src.getGlobalBounds().height / 2 - dst.getGlobalBounds().height / 2;
-    dst.setPosition(std::ceilf(x),
-                    std::ceilf(src.getGlobalBounds().top + height - dst.getLocalBounds().top + y));
+    auto const bounds = getGlobalBounds();
+    return { bounds.left + bounds.width, bounds.top + bounds.height };
+}
+
+float Text::getGlobalWidth() const
+{
+    return getGlobalBounds().width;
+}
+
+float Text::getGlobalHeight() const
+{
+    return getGlobalBounds().height;
+}
+
+void Text::setCenterOrigin()
+{
+    setVerticalCenterOrigin();
+    setHorizontalCenterOrigin();
+}
+
+void Text::setVerticalCenterOrigin()
+{
+    auto const bounds = getLocalBounds();
+    setOrigin(getOrigin().x, std::ceil((bounds.top + bounds.height) / 2));
+}
+
+void Text::setHorizontalCenterOrigin()
+{
+    auto const bounds = getLocalBounds();
+    setOrigin(std::ceil((bounds.left + bounds.width) / 2), getOrigin().y);
+}
+
+void Text::resetOrigin()
+{
+    setOrigin(0, 0);
+}
+
+void Text::centerIn(sf::Sprite const & source)
+{
+    centerVertically(source);
+    centerHorizontally(source);
+}
+
+void Text::centerVertically(sf::Sprite const & source)
+{
+    auto const b = source.getGlobalBounds();
+    auto const y = b.top + (b.height - getGlobalHeight() - getLocalBounds().top) / 2;
+    setPosition({ getPosition().x, std::ceil(y) });
+}
+
+void Text::centerHorizontally(sf::Sprite const & source)
+{
+    auto const b = source.getGlobalBounds();
+    auto const x = b.left + (b.width - getGlobalWidth() - getLocalBounds().left) / 2;
+    setPosition({ std::ceil(x), getPosition().y });
+}
+
+void Text::moveUnder(sf::Text const & source, float offsetY)
+{
+    auto const b = source.getGlobalBounds();
+    auto const l = getLocalBounds();
+    setPosition({ b.left - l.left, b.top + b.height + offsetY - l.top });
+}
+
+void Text::setOutline(sf::Color const & color, float thickness)
+{
+    setOutlineColor(color);
+
+    auto const oldThickness = getOutlineThickness();
+    setOutlineThickness(thickness ? thickness : (oldThickness ? oldThickness : 1.f));
+}
+
+void Text::removeOutline()
+{
+    setOutlineThickness(0);
 }

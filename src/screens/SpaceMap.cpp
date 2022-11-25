@@ -11,13 +11,12 @@
 #include "../utils/SfmlText.hpp"
 
 // Third-party includes
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Text.hpp>
 #include <SFML/Window/Event.hpp>
 #include <spdlog/spdlog.h>
 
 using namespace Screens;
-using namespace Utils;
 
 SpaceMapScreen::SpaceMapScreen() noexcept
     : _player { .level = Formulas::getLevelFromXp(_player.xp) }
@@ -27,6 +26,8 @@ void SpaceMapScreen::enter() try
 {
     Core::bAssert(_font.loadFromFile(fmt::format("assets/font/{}", Constants::fontFamily)),
                   "Failed to load _font");
+    Core::bAssert(_nbFont.loadFromFile(fmt::format("assets/font/{}", Constants::nbFontFamily)),
+                  "Failed to load _nbFont");
 
     SPDLOG_DEBUG("[SpaceMap] Loading textures");
     _textureManager.load("header",                "assets/ui/header.png");
@@ -47,7 +48,7 @@ void SpaceMapScreen::enter() try
 }
 catch (...)
 {
-    SPDLOG_ERROR("[SpaceMap] Failed to load textures");
+    SPDLOG_ERROR("[SpaceMap] Failed to load some assets");
 }
 
 void SpaceMapScreen::onEvent(sf::Event const & event)
@@ -133,68 +134,68 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
 
     // TEXT
 
-    constexpr auto startY  = 8;
-    constexpr auto spacing = 10;
+    auto miniMapHeaderLabel = Text::make(_nbFont, Constants::nbFontSize,
+                                         "MAP 3-1 /POS {}/{}", _miniMapPos.x, _miniMapPos.y);
+    miniMapHeaderLabel.centerVertically(miniMapHeader);
+    miniMapHeaderLabel.move(miniMapHeader.getPosition().x + Constants::spacing, 0);
 
-    auto miniMapHeaderLabel = makeText(_font, "MAP\t\t\t/POS");
-    centerVertically(miniMapHeaderLabel, miniMapHeader, miniMapHeader.getPosition().x + 6);
+    auto configLabel = Text::make(_font, Constants::subLabelFontSize, "CONFIGURATION");
+    configLabel.centerIn(configLabelBg);
 
-    auto miniMapPosition = makeText(_font, "\t\t{}/{}", _miniMapPos.x, _miniMapPos.y);
-    centerVertically(miniMapPosition, miniMapHeader,
-         miniMapHeaderLabel.getPosition().x + miniMapHeaderLabel.getLocalBounds().width);
+    auto config1 = Text::make(_nbFont, Constants::nbFontSize, "1");
+    auto config2 = Text::make(_nbFont, Constants::nbFontSize, "2");
 
-    auto configLabel = makeText(_font, "CONFIGURATION");
-    centerIn(configLabel, configLabelBg);
+    config1.centerIn(configActive);
+    config2.centerIn(configInactive);
 
-    auto config1 = makeText(_font, "1");
-    auto config2 = makeText(_font, "2");
+    auto xpLabel      = Text::make(_font, Constants::labelFontSize, "EXPÉRIENCE");
+    auto levelLabel   = Text::make(_font, Constants::labelFontSize, "LEVEL");
+    auto honorLabel   = Text::make(_font, Constants::labelFontSize, "HONOR");
+    auto jackpotLabel = Text::make(_font, Constants::labelFontSize, "JACKPOT");
 
-    centerIn(config1, configActive, 0, 1);
-    centerIn(config2, configInactive);
+    xpLabel.setPosition(248, Constants::startY);
+    levelLabel  .moveUnder(xpLabel,    Constants::spacing);
+    honorLabel  .moveUnder(levelLabel, Constants::spacing);
+    jackpotLabel.moveUnder(honorLabel, Constants::spacing);
 
-    auto xpLabel      = makeText(_font, "EXPERIENCE");
-    auto levelLabel   = makeText(_font, "LEVEL");
-    auto honorLabel   = makeText(_font, "HONOR");
-    auto jackpotLabel = makeText(_font, "JACKPOT");
+    auto xpValue      = Text::make(_nbFont, Constants::valueFontSize, "{:L}", _player.xp);
+    auto levelValue   = Text::make(_nbFont, Constants::valueFontSize, "{:L}", _player.level);
+    auto honorValue   = Text::make(_nbFont, Constants::valueFontSize, "{:L}", _player.honor);
+    auto jackpotValue = Text::make(_nbFont, Constants::valueFontSize, "{:L}", _player.jackpot);
 
-    setTextPosition(xpLabel,      248, startY);
-    setTextPosition(levelLabel,   248, xpLabel   .getPosition().y + Constants::fontSize + spacing);
-    setTextPosition(honorLabel,   248, levelLabel.getPosition().y + Constants::fontSize + spacing);
-    setTextPosition(jackpotLabel, 248, honorLabel.getPosition().y + Constants::fontSize + spacing);
+    xpValue     .setOrigin(xpValue     .getBottomRightPosition());
+    levelValue  .setOrigin(levelValue  .getBottomRightPosition());
+    honorValue  .setOrigin(honorValue  .getBottomRightPosition());
+    jackpotValue.setOrigin(jackpotValue.getBottomRightPosition());
 
-    auto xpValue      = makeText(_font, "{:L}", _player.xp);
-    auto levelValue   = makeText(_font, "{:L}", _player.level);
-    auto honorValue   = makeText(_font, "{:L}", _player.honor);
-    auto jackpotValue = makeText(_font, "{:L}", _player.jackpot);
+    xpValue.setPosition(     415, xpLabel     .getBottomRightPosition().y + 1);
+    levelValue.setPosition(  415, levelLabel  .getBottomRightPosition().y);
+    honorValue.setPosition(  415, honorLabel  .getBottomRightPosition().y + 1);
+    jackpotValue.setPosition(415, jackpotLabel.getBottomRightPosition().y + 1);
 
-    xpValue     .setOrigin(std::ceilf(xpValue     .getLocalBounds().width), 0.f);
-    levelValue  .setOrigin(std::ceilf(levelValue  .getLocalBounds().width), 0.f);
-    honorValue  .setOrigin(std::ceilf(honorValue  .getLocalBounds().width), 0.f);
-    jackpotValue.setOrigin(std::ceilf(jackpotValue.getLocalBounds().width), 0.f);
+    auto creditsLabel = Text::make(_font, Constants::labelFontSize - 1, "CREDITS");
+    auto uridiumLabel = Text::make(_font, Constants::labelFontSize - 1, "URIDIUM");
+    auto cargoLabel   = Text::make(_font, Constants::labelFontSize - 1, "CARGO BAY");
 
-    setTextPosition(xpValue,      415,                     xpLabel     .getGlobalBounds().top);
-    setTextPosition(levelValue,   xpValue.getPosition().x, levelLabel  .getGlobalBounds().top);
-    setTextPosition(honorValue,   xpValue.getPosition().x, honorLabel  .getGlobalBounds().top);
-    setTextPosition(jackpotValue, xpValue.getPosition().x, jackpotLabel.getGlobalBounds().top);
+    creditsLabel.setVerticalCenterOrigin();
+    uridiumLabel.setVerticalCenterOrigin();
+    cargoLabel  .setVerticalCenterOrigin();
 
-    auto creditsLabel = makeText(_font, "CREDITS");
-    auto uridiumLabel = makeText(_font, "URIDIUM");
-    auto cargoLabel   = makeText(_font, "CARGO BAY");
+    creditsLabel.setPosition(511, Constants::startY + 6);
+    uridiumLabel.setPosition(571, Constants::startY + 6);
+    cargoLabel  .setPosition(631, Constants::startY + 6);
 
-    auto creditsValue = makeText(_font, "{:L}", _player.credits);
-    auto uridiumValue = makeText(_font, "{:L}", _player.uridium);
-    auto cargoValue   = makeText(_font, "{:L}", _ship.curCargo);
+    creditsLabel.resetOrigin();
+    uridiumLabel.resetOrigin();
+    cargoLabel  .resetOrigin();
 
-    setTextPosition(creditsLabel, 510,                                         startY + 2);
-    setTextPosition(uridiumLabel, 580,                                         startY + 2);
-    setTextPosition(cargoLabel,   670 - cargoLabel.getLocalBounds().width / 2, startY + 2);
+    auto creditsValue = Text::make(_nbFont, Constants::nbFontSize, "{:L}", _player.credits);
+    auto uridiumValue = Text::make(_nbFont, Constants::nbFontSize, "{:L}", _player.uridium);
+    auto cargoValue   = Text::make(_nbFont, Constants::nbFontSize, "{:L}", _ship.curCargo);
 
-    setTextPosition(creditsValue, creditsLabel.getPosition().x,
-                                  creditsLabel.getPosition().y + Constants::fontSize + spacing - 2);
-    setTextPosition(uridiumValue, uridiumLabel.getPosition().x,
-                                  uridiumLabel.getPosition().y + Constants::fontSize + spacing - 2);
-    setTextPosition(cargoValue,   cargoLabel  .getPosition().x,
-                                  cargoLabel  .getPosition().y + Constants::fontSize + spacing - 2);
+    creditsValue.moveUnder(creditsLabel, Constants::spacing - 2);
+    uridiumValue.moveUnder(uridiumLabel, Constants::spacing - 2);
+    cargoValue  .moveUnder(cargoLabel,   Constants::spacing - 2);
 
     for (sf::Text * t : { &creditsLabel, &creditsValue, &uridiumLabel,
                           &uridiumValue, &cargoLabel,   &cargoValue })
@@ -203,10 +204,10 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
                      std::ceilf(t->getLocalBounds().height / 2));
     }
 
-    auto shieldLabel  = makeText(_font, "SHIELD");
-    auto hpLabel      = makeText(_font, "HIT POINTS");
-    auto ammoLabel    = makeText(_font, "AMMO");
-    auto rocketsLabel = makeText(_font, "ROCKETS");
+    auto shieldLabel  = Text::make(_font, Constants::labelFontSize, "SHIELD");
+    auto hpLabel      = Text::make(_font, Constants::labelFontSize, "HIT POINTS");
+    auto ammoLabel    = Text::make(_font, Constants::labelFontSize, "AMMO");
+    auto rocketsLabel = Text::make(_font, Constants::labelFontSize, "ROCKETS");
 
     hpLabel     .setOrigin(std::ceilf(hpLabel     .getLocalBounds().width), 0.f);
     shieldLabel .setOrigin(std::ceilf(shieldLabel .getLocalBounds().width), 0.f);
@@ -214,28 +215,54 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     rocketsLabel.setOrigin(std::ceilf(rocketsLabel.getLocalBounds().width), 0.f);
 
     shieldLabel .setPosition(shieldAmountBg .getPosition().x - 5,
-                             shieldAmountBg .getPosition().y - 2);
+                             shieldAmountBg .getPosition().y - 5);
     hpLabel     .setPosition(hpAmountBg     .getPosition().x - 5,
-                             hpAmountBg     .getPosition().y - 1);
+                             hpAmountBg     .getPosition().y - 5);
     ammoLabel   .setPosition(ammoAmountBg   .getPosition().x - 5,
-                             ammoAmountBg   .getPosition().y - 1);
+                             ammoAmountBg   .getPosition().y - 5);
     rocketsLabel.setPosition(rocketsAmountBg.getPosition().x - 5,
-                             rocketsAmountBg.getPosition().y - 1);
+                             rocketsAmountBg.getPosition().y - 5);
 
-    auto shieldValue  = makeText(_font, "{:L} / {:L}", _ship.curShield,  _ship.maxShield);
-    auto hpValue      = makeText(_font, "{:L} / {:L}", _ship.curHp,      _ship.maxHp);
-    auto ammoValue    = makeText(_font, "{:L} / {:L}", _ship.curAmmo,    _ship.maxAmmo);
-    auto rocketsValue = makeText(_font, "{:L} / {:L}", _ship.curRockets, _ship.maxRockets);
+    auto shieldValue  = Text::make(_nbFont, Constants::nbFontSize,
+                                   "{:L} / {:L}", _ship.curShield, _ship.maxShield);
+    auto hpValue      = Text::make(_nbFont, Constants::nbFontSize,
+                                   "{:L} / {:L}", _ship.curHp, _ship.maxHp);
+    auto ammoValue    = Text::make(_nbFont, Constants::nbFontSize,
+                                   "{:L} / {:L}", _ship.curAmmo, _ship.maxAmmo);
+    auto rocketsValue = Text::make(_nbFont, Constants::nbFontSize,
+                                   "{:L} / {:L}", _ship.curRockets, _ship.maxRockets);
 
-    setOutline(shieldValue,  sf::Color::Black);
-    setOutline(hpValue,      sf::Color::Black);
-    setOutline(ammoValue,    sf::Color::Black);
-    setOutline(rocketsValue, sf::Color::Black);
+    shieldValue. setOutline(sf::Color::Black);
+    hpValue.     setOutline(sf::Color::Black);
+    ammoValue.   setOutline(sf::Color::Black);
+    rocketsValue.setOutline(sf::Color::Black);
 
-    centerIn(shieldValue,  shieldAmountBg,  0, 1);
-    centerIn(hpValue,      hpAmountBg,      0, 1);
-    centerIn(ammoValue,    ammoAmountBg,    0, 1);
-    centerIn(rocketsValue, rocketsAmountBg, 0, 1);
+    shieldValue .centerIn(shieldAmountBg);
+    hpValue     .centerIn(hpAmountBg);
+    ammoValue   .centerIn(ammoAmountBg);
+    rocketsValue.centerIn(rocketsAmountBg);
+
+    auto const drawWithBorder = [&target] (auto const & source,
+                                           sf::Color const & color = sf::Color::Red)
+    {
+        auto const bounds = source.getGlobalBounds();
+
+        sf::RectangleShape rect({ bounds.width, bounds.height });
+        rect.setPosition(bounds.left, bounds.top);
+        rect.setFillColor(sf::Color::Transparent);
+        rect.setOutlineColor(color);
+        rect.setOutlineThickness(1);
+
+        target.draw(source);
+        target.draw(rect);
+
+//        sf::RectangleShape rect2({ bounds.width, bounds.height });
+//        rect2.setPosition(source.getPosition());
+//        rect2.setFillColor(sf::Color::Transparent);
+//        rect2.setOutlineColor(color);
+//        rect2.setOutlineThickness(1);
+//        target.draw(rect2);
+    };
 
     target.draw(header);
     target.draw(hpAmountBg);
@@ -254,7 +281,6 @@ void SpaceMapScreen::draw(sf::RenderTarget & target, sf::RenderStates) const try
     target.draw(inventoryContentBg);
     // Draw text on top
     target.draw(miniMapHeaderLabel);
-    target.draw(miniMapPosition);
     target.draw(configLabel);
     target.draw(config1);
     target.draw(config2);
