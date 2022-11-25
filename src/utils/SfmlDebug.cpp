@@ -13,6 +13,11 @@
 
 std::ostream & sf::operator<<(std::ostream & os, FloatRect const & rect)
 {
-    return os << fmt::format("left = {} ; top = {} ; width = {} ; height = {}",
+    return os << fmt::format("FloatRect(left: {}, top: {}, width: {}, height: {})",
                              rect.left, rect.top, rect.width, rect.height);
+}
+
+std::ostream & sf::operator<<(std::ostream & os, Vector2f const & vec)
+{
+    return os << fmt::format("Vector2f({}, {})", vec.x, vec.y);
 }

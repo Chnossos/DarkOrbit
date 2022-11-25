@@ -12,5 +12,9 @@ namespace sf
     template<typename T> class Rect;
     using FloatRect = Rect<float>;
 
+    template<typename T> class Vector2;
+    using Vector2f = Vector2<float>;
+
     std::ostream & operator<<(std::ostream & os, FloatRect const & rect);
+    std::ostream & operator<<(std::ostream & os, Vector2f const & vec);
 } // !namespace sf
