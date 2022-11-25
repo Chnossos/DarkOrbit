@@ -14,7 +14,7 @@
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Window/Event.hpp>
-#include <spdlog/async.h>
+//#include <spdlog/async.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
@@ -81,21 +81,22 @@ namespace
 {
     void configureLogging()
     {
+#ifdef _WIN32
+        // Enable logs when started from a terminal (IDE or external)
+        if (AttachConsole(ATTACH_PARENT_PROCESS))
+        {
+            SetConsoleOutputCP(CP_UTF8);
+            std::freopen("CONOUT$", "w", stdout);
+            std::freopen("CONOUT$", "w", stderr);
+        }
+#endif
+
         spdlog::set_level(spdlog::level::trace);
 #ifdef NDEBUG
         spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v (%s:%#)");
 #else
         spdlog::set_pattern("%C-%m-%d %H:%M:%S.%e [%t] [%^%L%$] %v (%s:%!:%#)");
 #endif
-
-#ifdef _WIN32
-        // Enable logs when started from a terminal (IDE or external)
-        if (AttachConsole(ATTACH_PARENT_PROCESS))
-            SetConsoleOutputCP(CP_UTF8);
-#endif
-
-        auto console = spdlog::create_async_nb<spdlog::sinks::stdout_color_sink_mt>("console");
-        spdlog::set_default_logger(std::move(console));
 
         // Needed for localized string format
         std::locale const currentLocale(getCurrentLocale());

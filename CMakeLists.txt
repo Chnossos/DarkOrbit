@@ -11,6 +11,8 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
         SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE
         $<$<PLATFORM_ID:Windows>:WIN32_LEAN_AND_MEAN>
+        $<$<BOOL:${MSVC}>:_CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES=1>
+        $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
 )
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
